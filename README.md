@@ -1,5 +1,5 @@
 <!-- sdd-starter-template -->
-# sdd-starter
+# Spec Driven Development project starter 
 
 A GitHub template for building software with AI agents, spec-first, where you
 are the source of truth and the agent is the hands.
