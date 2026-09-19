@@ -8,7 +8,7 @@ Create a repo from it, open your coding agent, and say what you want to build.
 The agent interviews you, one question at a time, always with a recommended
 answer, until it understands the product, the domain, and how you like code
 written. Then it works down through the levels of abstraction: product brief,
-bounded contexts, vertical slices, intent, specification, plan, tasks, code.
+bounded contexts, changes, intent, proposal and delta, plan, tasks, code.
 Every artefact stops for your approval. Nothing is inferred, nothing is
 re-asked, and no implementation code is written before a spec you have approved
 exists.
@@ -49,12 +49,13 @@ for every decision and write each one down:
 | Brainstorm | `docs/intent-product.md` | what you are trying to achieve, in your words, before anything is structured |
 | Product | `docs/product.md` | what this is, for whom, what success means, what is out of scope for ever |
 | Domain | `docs/domain.md` | how the product divides into bounded contexts, what events pass between them, what must never be false |
-| Roadmap | `docs/roadmap.md` | which thin vertical slices to build, in what order, where the cut line is |
-| Slice intent | `specs/NNN/intent.md` | everything about one slice, in your words, recorded as you answer |
-| Specification | `specs/NNN/spec.md` | what and why, as testable requirements with Given/When/Then scenarios, no technology |
+| Roadmap | `docs/roadmap.md` | which changes to make, each a thin vertical slice, in what order, where the cut line is |
+| Change intent | `changes/NNN/intent.md` | everything about one change, in your words, recorded as you answer |
+| Proposal + delta | `changes/NNN/proposal.md`, `delta/` | what and why, and exactly which requirements are added, modified or removed in which capability, no technology |
 | Preferences | `docs/engineering.md` | how you like code written, asked at the first plan, then reused across every project |
-| Plan | `specs/NNN/plan.md` | how: stack, data, interfaces, structure, every choice with its rejected alternative |
-| Tasks | `specs/NNN/tasks.md` | self-contained work units, each naming the scenario it proves |
+| Plan | `changes/NNN/plan.md` | how: stack, data, interfaces, structure, every choice with its rejected alternative |
+| Tasks | `changes/NNN/tasks.md` | self-contained work units, each naming the scenario it proves |
+| Current truth | `specs/<context>/<capability>.md` | nothing; it is merged from approved deltas when a change ships, and it is what the system does now |
 
 Three rules hold it together.
 
@@ -67,7 +68,7 @@ nothing proceeds until you approve. Approval stamps the file with a
 `verified: human:<you>` entry.
 
 Something always checks. Implementation is reviewed per task by an agent that
-did not write it, then the whole slice is audited against the spec by a
+did not write it, then the whole change is audited against its spec by a
 reviewer that saw none of the work. Tests are the spec's scenarios, written so
 the implementation could be thrown away and rewritten without touching them.
 
@@ -90,7 +91,7 @@ Then, in the agent session:
 
 That is the only command you need to remember. It walks you through the opening
 interviews, which take about 45 minutes for a real product, ratifies the
-constitution, and offers to start the first slice. None of it asks about
+constitution, and offers to start the first change. None of it asks about
 technology; that starts at the first plan. After that you just say what
 you want, and the `sdd` skill works out which phase you are in and routes you.
 
@@ -109,8 +110,8 @@ you have them, and makes the first commit.
                     └──────────────────┬───────────────────────────┘
                                        │
                     ┌──────────────────▼───────────────────────────┐
-  once per slice    │  grill          → intent.md     (you talk)   │
-                    │  sdd-specify    → spec.md       [GATE]       │
+  once per change   │  grill          → intent.md     (you talk)   │
+                    │  sdd-specify    → proposal + delta  [GATE]   │
                     │  sdd-plan       → plan.md       [GATE]       │
                     │       └ first time: engineering prefs, then  │
                     │         the stack is chosen here             │
@@ -119,9 +120,9 @@ you have them, and makes the first commit.
                     │       ├ brief   → implementer (cheap model)  │
                     │       ├ verify  → controller re-runs tests   │
                     │       └ review  → task-reviewer, fix loop    │
-                    │  sdd-converge   → reviewer audits the slice  │
+                    │  sdd-converge   → reviewer audits the change │
                     │       └ gaps    → back to implement          │
-                    │  sdd-finish     → merge / PR / keep          │
+                    │  sdd-finish     → merge delta into specs/, PR│
                     └──────────────────────────────────────────────┘
 ```
 
@@ -136,8 +137,9 @@ from scratch, and you are only questioned on what the brainstorm left out.
 Domain discovery follows, where nouns become bounded contexts, verbs become
 events, and "what must never be true" becomes invariants. Then the
 constitution, which is three project-specific articles on top of the fixed
-ones. Then the roadmap, the product decomposed into vertical slices, each thin,
-end to end, useful on its own, and belonging to exactly one context. Then the
+ones. Then the roadmap, the product decomposed into changes, each a thin
+vertical slice: end to end, useful on its own, and belonging to exactly one
+context. Then the
 glossary, with every term scoped to a context, in your definition.
 
 Every step of init is technology-free by design. Which language, which
@@ -146,20 +148,24 @@ until the product, its constraints and its non-functional requirements exist,
 so none of them are asked. If you volunteer one, it is recorded as your stated
 preference and not followed up.
 
-`grill` runs for each slice: an interview that walks the decision tree top down
+`grill` runs for each change: an interview that walks the decision tree top down
 through purpose, context, boundaries, actors, data, states, failure modes, the
 boring realities like time zones and money and unicode and concurrency, scale,
 lifecycle, and done. It looks things up in the repo before asking. It pushes on
 weak answers. It accepts "I don't know" and records it as an open question.
 Every answer is written to `intent.md` as it is given, in your words.
 
-`sdd-specify` turns the intent into `spec.md`: what and why, no technology.
-Requirements go in EARS notation (`WHEN … THE SYSTEM SHALL …`), each with
+`sdd-specify` turns the intent into a proposal and one or more deltas: what and
+why in `proposal.md`, and in `delta/<context>/<capability>.md` exactly which
+requirements are added, modified or removed in the living spec, each with
 Given/When/Then scenarios carrying real values, including the failure paths. A
-Domain section names the context, the events, and the invariants. The most
-valuable section is the one listing what is explicitly out of scope. Gate.
+modified requirement shows its old sentence so the diff is visible. The delta is
+previewed against the current truth before you see it, so a change that would
+add an ID that exists or modify one that does not is caught here. The most
+valuable section of the proposal is the one listing what is explicitly out of
+scope. Gate.
 
-`sdd-plan` is where technology finally enters. On the first slice it runs the
+`sdd-plan` is where technology finally enters. On the first change it runs the
 engineering-preferences interview if you have no master file yet, asking the
 principles first (paradigm, types, errors, testing) and the languages and
 tooling last, framed as what you reach for rather than a decision for this
@@ -195,15 +201,20 @@ it marks the task done and commits. An implementer that hits a gap reports
 `NEEDS_CONTEXT` and the question comes to you. It never guesses.
 
 `sdd-converge` puts a `reviewer` subagent on the strongest model, one that did
-not watch any of the above, to audit the slice against `spec.md`, `plan.md`,
+not watch any of the above, to audit the change against its proposal, its
+deltas, the target state, `plan.md`,
 the constitution, your preferences and `REVIEW.md`. It checks that every
 scenario has a test, that every test goes through the public interface, that no
 context imports another's internals, that no dependency arrived unplanned, and
 that no secret is in the tree. Gaps go back into `tasks.md`, and it repeats
 until clean.
 
-`sdd-finish` merges, opens a PR, or keeps the branch. Roadmap goes to shipped.
-It offers the next slice.
+`sdd-finish` is where the truth changes. It merges the deltas into
+`specs/<context>/<capability>.md`, bumps each capability's version, records the
+change in its history, re-runs the standing coverage check over every living
+spec, applies any approved edits to the domain map or glossary, archives the
+change under `changes/archive/`, and offers a PR. From then on the living spec
+is what the system does, and the next change is written against it.
 
 ## What you will be asked, and when
 
@@ -215,14 +226,14 @@ nowhere else.
 | What you are trying to achieve, openly | `/sdd-init` step 2, once | recorded in `docs/intent-product.md` |
 | The big questions: what, for whom, contexts, invariants | `/sdd-init`, once | recorded in `docs/` and `docs/decisions.md` |
 | How you like code written | the first `sdd-plan`, once ever | recorded in `docs/engineering.md` and your master copy |
-| Everything about a slice | `grill`, once per slice | recorded in `intent.md` |
+| Everything about a change | `grill`, once per change | recorded in `intent.md` |
 | Approve or revise | each gate: spec, plan, tasks, and the init docs | approval is a `verified` stamp on the file |
 | A question the brief could not answer | mid-implementation, rarely | answered once, added to `decisions.md` |
 | Accept a warning by name | converge, if any | recorded in the report |
 | Merge, PR or keep | finish | |
 
 The agent is told to prefer a small number of good questions over silent
-assumptions, and to recommend an answer with every question. A typical slice
+assumptions, and to recommend an answer with every question. A typical change
 costs you one `grill` session and three approvals.
 
 ## The artefacts
@@ -243,19 +254,25 @@ docs/
   product.md            what this is, for whom, constraints, lifecycle
   domain.md             bounded contexts, code roots, events, invariants
   engineering.md        how you like code written, copied from your master
-  roadmap.md            vertical slices in build order, with status
+  roadmap.md            changes in build order, with status
   glossary.md           the vocabulary, scoped per context
   intent-product.md     the opening brainstorm, in your words
   decisions.md          append-only; every decision you have made
   adr/                  architecture decision records
   sdd-guide.md          the long-form guide to all of this
   okf.md                the frontmatter and what each field means
-specs/NNN-slug/         one directory per slice
-  intent.md             your words, Q&A record
-  spec.md               WHAT and WHY: EARS requirements, scenarios, no tech
-  plan.md               HOW: stack, data, interfaces, structure, risks
-  tasks.md              self-contained task blocks
-  notes.md              decisions taken during implementation
+specs/                  what the system does NOW, by bounded context
+  <context>/
+    <capability>.md     living spec: every true requirement, versioned, with history
+changes/                what is being changed
+  NNN-slug/             one directory per change
+    intent.md           your words, Q&A record
+    proposal.md         WHAT and WHY; which capabilities it touches; what it affects
+    delta/<ctx>/<cap>.md  ADDED / MODIFIED / REMOVED against the living spec
+    plan.md             HOW: stack, data, interfaces, structure, risks
+    tasks.md            self-contained task blocks
+    notes.md            decisions taken during implementation
+  archive/              shipped changes, kept for history
 templates/              what the skills fill in
 scripts/                see below
 .claude/skills/         the workflow, 16 skills
@@ -276,8 +293,30 @@ Judgement at the top, hands at the bottom, model power following:
 | `sdd-finish` | main session | any |
 
 There is one deliberate bend in the ladder. Verification is never weaker than
-what it verifies, so the slice-level reviewer is pinned to the strongest model.
+what it verifies, so the change-level reviewer is pinned to the strongest model.
 Tiers are set in `.claude/agents/*.md` and are yours to change.
+
+## How the product evolves
+
+The specs are not a changelog. `specs/` holds one living document per
+capability, and it is the only place that says what the system does now.
+Every change, from the first feature to a one-line rule tweak years later, is
+the same shape: an intent in your words, a proposal, and a delta that says
+what is added, modified or removed in which capability. Until the change
+ships, everyone works against a preview of the living spec with the delta
+applied. When it ships, the delta is merged in, the capability's version goes
+up, the change is archived, and the next change is written against the new
+truth.
+
+A removed requirement stays in the living spec, struck through, with the
+change that removed it. IDs are never reused. A capability's history table
+lists every change that shaped it. So "what does readings do" is one file,
+"why does it do that" is its sources, and "what did we think last spring" is
+the archive.
+
+The first change is not special: it is a delta that is all ADDED into a
+capability that does not exist yet, and the merge creates it. There is no
+initial-build mode and no migration to an evolution mode.
 
 ## What the agent is not allowed to do
 
@@ -296,6 +335,10 @@ It cannot read or write `.env*`, keys, secrets or credentials. Denied in
 
 It cannot run `git push`, `git reset --hard` or `rm -rf`. Pushing is the one
 step that leaves your machine, and it stays yours.
+
+It cannot edit a living spec. `specs/**` is blocked by the hook; the only
+writer is `merge_delta.py`, at finish, after you approved the delta and the
+change converged.
 
 It cannot hand-edit frontmatter. `scripts/fm.py` and `scripts/approve.sh` are
 the only way, so `status` and `sdd_phase` can never disagree.
@@ -320,9 +363,11 @@ behalf.
 |---|---|
 | "I want to add X" | `sdd` classifies it (trivial, small or full), reads the roadmap, and routes, usually to `grill` |
 | `quick: fix the typo in the footer` | done directly, no ceremony |
+| "what does X do now" | reads `specs/<context>/<capability>.md` and answers; no change opened |
+| "change how X works" | `grill` on the existing capability, then a delta with MODIFIED and REMOVED entries |
 | "where were we" or "carry on" | resumes from the last `done` task |
-| "grill me on X" | the interview, for anything, not only slices |
-| "converge" or "did we build what we specced" | the slice audit |
+| "grill me on X" | the interview, for anything, not only changes |
+| "converge" or "did we build what we specced" | the change audit |
 | "ship it" or "open the PR" | `sdd-finish` |
 | "my coding preferences" | `sdd-engineering`: view, refine, sync to master |
 | "amend the constitution" | `sdd-constitution`: proposed, gated, versioned |
@@ -339,15 +384,16 @@ All stdlib bash and Python 3, no dependencies.
 | Script | Does |
 |---|---|
 | `init.sh "Name" "One line"` | one-time instantiation of a repo made from this template |
-| `new-feature.sh <slug> [--branch]` | allocates the next `NNN`, seeds the slice from templates |
+| `new-change.sh <slug> [--branch]` | allocates the next change number (archived ones count), seeds the change from templates |
+| `merge_delta.py preview\|apply <change>` | previews a change's deltas against the living specs into `.sdd/target/`, or merges them in at finish |
 | `fm.py get\|set\|check\|verify` | the only way frontmatter is read or written |
 | `approve.sh <file> <phase>` | the only way a gate is passed; stamps `verified`, appends to `log.md` |
 | `index.sh` | regenerates every `index.md` from frontmatter |
 | `check-specs.sh` | lints the artefact tree: phases, contexts, scenarios, placeholders, tech in specs |
 | `check-contexts.sh` | fails a cross-context import that bypasses `published/` |
-| `check-scenarios.sh` | every spec scenario has a test citing it |
-| `task-brief.sh <slice> <TID>` | extracts one task into a self-contained brief for the implementer |
-| `review-package.sh <slice> <TID> <base>` | packages a task's diff for the reviewer |
+| `check-scenarios.sh` | every live scenario has a test and no test cites a removed requirement; `--change` checks a change's target state |
+| `task-brief.sh <change> <TID>` | extracts one task into a self-contained brief for the implementer |
+| `review-package.sh <change> <TID> <base>` | packages a task's diff for the reviewer |
 | `hooks/guard-paths.sh` | `PreToolUse`: protected paths |
 | `hooks/post-edit.sh` | `PostToolUse`: runs your formatter, filled in by the first plan |
 
@@ -393,6 +439,8 @@ Nothing here is novel. It is a deliberate assembly of current practice, and
 each part is credited in [`docs/sdd-guide.md`](docs/sdd-guide.md):
 
 - The gate workflow and constitution come from GitHub Spec Kit.
+- Living specs plus change proposals with delta specs, merged on ship, come
+  from OpenSpec.
 - The chain of artefacts (`intent.md`, spec, plan, diff, review), hooks as
   boundaries, `REVIEW.md`, subagent verifiers and the "things agents get wrong"
   list come from Anthropic's AI-Native SDLC playbook.
