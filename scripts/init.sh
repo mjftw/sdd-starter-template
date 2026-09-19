@@ -15,7 +15,7 @@ if ! grep -q '<PROJECT NAME>' README.md; then
 fi
 
 # Seed the project-level docs from templates.
-for t in product roadmap glossary; do
+for t in product domain roadmap glossary; do
   sed -e "s|conversation:YYYY-MM-DD|conversation:${TODAY}|" \
       -e "s|at: YYYY-MM-DDTHH:MM:SSZ|at: ${NOW}|" \
       "templates/${t}-template.md" > "docs/${t}.md"
