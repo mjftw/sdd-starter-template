@@ -9,10 +9,13 @@ DESC="${2:?usage: init.sh \"Project Name\" \"One-line description\"}"
 TODAY=$(date +%Y-%m-%d)
 NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 
-if ! grep -q '<PROJECT NAME>' README.md; then
-  echo "already initialised (README.md has no <PROJECT NAME> placeholder)" >&2
+if ! grep -q '<!-- sdd-starter-template -->' README.md; then
+  echo "already initialised (README.md is no longer the template's README)" >&2
   exit 1
 fi
+
+# This repo's README becomes the project's README; the template's own goes.
+cp templates/README-project.md README.md
 
 # Seed the project-level docs from templates.
 for t in product domain roadmap glossary; do

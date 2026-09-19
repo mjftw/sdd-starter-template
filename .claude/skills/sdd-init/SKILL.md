@@ -18,8 +18,9 @@ answer is recorded in their words. Nothing is inferred. Article I.
 
 ## Step 1 — Mechanical setup
 
-If `README.md` still contains `<PROJECT NAME>`, ask for the project name and a
-one-line description, then run:
+If `README.md` is still the template's own (its first line is
+`<!-- sdd-starter-template -->`), ask for the project name and a one-line
+description, then run:
 
     ./scripts/init.sh "<name>" "<one line>"
 

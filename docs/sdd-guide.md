@@ -24,7 +24,7 @@ Agent instructions live in `AGENTS.md`.
 ## Quick start
 
 ```bash
-# 1. New repo from this template, then:
+# 1. Use this template on GitHub, clone the new repo, then:
 ./scripts/init.sh "Project Name" "One-line description"
 
 # 2. Open your agent here. Claude Code:

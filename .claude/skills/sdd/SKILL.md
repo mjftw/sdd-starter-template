@@ -29,8 +29,9 @@ State the classification and the path in one line, then continue.
 
 Do this before asking the user anything:
 
-1. `docs/product.md` — missing, or still contains `<PROJECT NAME>`? Then the
-   project is uninitialised; the only action is `sdd-init`. Say so.
+1. `docs/product.md` — missing, or still contains `<PROJECT NAME>`, or
+   `README.md` starts with `<!-- sdd-starter-template -->`? Then the project
+   is uninitialised; the only action is `sdd-init`. Say so.
 2. `docs/decisions.md` — read it. Nothing in it is asked again, in any phase.
 3. `memory/constitution.md` — `sdd_phase` not `ratified`, or contains
    `PLACEHOLDER`? Then `sdd-constitution` first.
