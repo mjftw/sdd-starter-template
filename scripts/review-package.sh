@@ -24,7 +24,7 @@ HEAD_SHA=$(git rev-parse HEAD)
   echo "description: The diff produced for $TID, for the task reviewer."
   echo "resource: /$OUT"
   echo "status: draft"
-  echo "tags: [sdd, review, \"slice:$NAME\"]"
+  echo "tags: [sdd, review, \"change:$NAME\"]"
   echo "sources:"
   echo "  - resource: /.sdd/briefs/$NAME/$TID.md"
   echo "  - resource: git:${BASE}..${HEAD_SHA}"

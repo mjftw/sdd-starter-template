@@ -35,6 +35,10 @@ h2() { # file "## Heading"
 TARGET=".sdd/target/$NAME"
 ./scripts/merge_delta.py preview "$SLICE" >/dev/null || { echo "error: could not build target state for $SLICE" >&2; exit 1; }
 
+N=$(grep -cE "^### $TID " "$SLICE/tasks.md" || true)
+if [[ "$N" -gt 1 ]]; then
+  echo "error: $TID appears $N times in $SLICE/tasks.md; fix the duplicate before briefing" >&2; exit 1
+fi
 TASK=$(section "$SLICE/tasks.md" "### $TID ")
 if [[ -z "$TASK" ]]; then
   echo "error: no task '$TID' in $SLICE/tasks.md" >&2; exit 1
@@ -50,7 +54,7 @@ STALE=$(date -u -d '+7 days' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+7d +%
   echo "description: Everything needed to implement $TID, and nothing else."
   echo "resource: /$OUT"
   echo "status: draft"
-  echo "tags: [sdd, brief, \"slice:$NAME\"]"
+  echo "tags: [sdd, brief, \"change:$NAME\"]"
   echo "sources:"
   echo "  - resource: /$SLICE/tasks.md"
   echo "  - resource: /$SLICE/proposal.md"

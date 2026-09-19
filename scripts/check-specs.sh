@@ -163,7 +163,9 @@ for d in changes/[0-9][0-9][0-9]-*/; do
   fi
 
   if [[ -f "$d/tasks.md" ]]; then
-    for t in $(grep -oE '^### T[0-9]+' "$d/tasks.md" | sed 's/### //'); do
+    dupes=$(grep -oE '^### T[0-9]+' "$d/tasks.md" | sed 's/### //' | sort | uniq -d)
+    [[ -n "$dupes" ]] && bad "tasks.md has duplicate task IDs: $(echo $dupes | tr '\n' ' ') — the brief would pick the first"
+    for t in $(grep -oE '^### T[0-9]+' "$d/tasks.md" | sed 's/### //' | sort -u); do
       blk=$(awk -v t="### $t " 'index($0,t)==1{p=1;print;next} p&&(/^### /||/^## /){exit} p{print}' "$d/tasks.md")
       for need in '\*\*Status:\*\*' '\*\*Files\*\*' '\*\*Steps\*\*' '\*\*Verify\*\*'; do
         printf '%s' "$blk" | grep -qE "$need" || warn "$t is missing $need"
