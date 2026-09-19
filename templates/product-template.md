@@ -7,6 +7,7 @@ status: draft
 tags: [sdd, product-brief]
 sources:
   - resource: conversation:YYYY-MM-DD
+  - resource: /docs/intent-product.md
 generated:
   by: claude-code/unknown
   at: YYYY-MM-DDTHH:MM:SSZ
@@ -53,10 +54,14 @@ them.>
 
 ## Constraints that exist before any code
 
+> Only what is *imposed*: by the users, the environment, the law, the budget,
+> the calendar. Anything you are free to choose is left blank here and chosen
+> in the first plan, from the whole picture. "I'd like to use X" is a
+> preference and goes in `docs/engineering.md`, not here.
+
 | Constraint | Detail | Source |
 |---|---|---|
-| Platform / runtime | | |
-| Hosting / where it runs | | |
+| Must run on / where it has to live | | |
 | Data location / sovereignty | | |
 | Must integrate with | | |
 | Licensing | | |

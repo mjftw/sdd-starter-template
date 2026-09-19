@@ -27,10 +27,32 @@ reason**.
 6. Read `docs/domain.md` and the `ddd` skill. The plan's Structure mirrors the
    slice's context root; anything other contexts may use goes under
    `published/`; consumed events are translated at an adapter.
-7. Read `docs/engineering.md`. Every stack, testing, error-handling and
+7. **If `docs/engineering.md` is missing or its `sdd_phase` is not
+   `approved`, run `sdd-engineering` now.** This is the first moment in a
+   project that needs to know how code is written, which is why the
+   interview lives here and not in `sdd-init`. Then read `docs/engineering.md`. Every stack, testing, error-handling and
    architecture choice in the plan follows it. Where the plan must depart (the
    preference does not fit this problem), name the section and the reason under
    `## Open questions` — the user decides, not the plan.
+
+## Choosing the stack
+
+This is the first artefact in the project that names a technology, and the
+choice is made *here*, from evidence, in this order:
+
+1. The imposed constraints in `docs/product.md` (where it must run, where
+   data may live, what it must integrate with, deadline). These are not
+   negotiable.
+2. The non-functional requirements in `spec.md` (the ones with numbers).
+3. The domain map: what each context needs (a stream processor, a native
+   client, a batch job) may differ per context.
+4. `docs/engineering.md` §1 and §14: what the user reaches for. An input,
+   not a verdict. Departing from it needs a stated reason in the Open
+   questions; following it needs none.
+5. What the repository already uses, if anything.
+
+Say in the Approach paragraph which of these drove the choice. A stack chosen
+from familiarity alone, with 1–3 unexamined, is the plan not doing its job.
 
 ## Writing the plan
 

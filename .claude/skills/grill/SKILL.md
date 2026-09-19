@@ -87,13 +87,19 @@ turned off? What does "reversible" mean here?
 **Done** — What is the acceptance test? Who signs it off? What is deliberately
 left for later, and is that written down?
 
+Never ask which language, framework, database or host. Those are plan
+decisions. If the user raises one, record it as a stated preference under
+`## Constraints` and return to behaviour.
+
 ## Output — `intent.md`
 
 Every answer the user gives is the most expensive thing in this repository to
 obtain. It is recorded as you go, not reconstructed at the end.
 
-Before the first question, create the slice if it does not exist
-(`./scripts/new-feature.sh <slug>`) and open `specs/NNN-slug/intent.md`. As
+Before the first question, for a slice, create it if it does not exist
+(`./scripts/new-feature.sh <slug>`) and open `specs/NNN-slug/intent.md`. For
+the product, copy `templates/intent-template.md` to `docs/intent-product.md`
+and set its `resource` and `title` (see "Product-level grilling" below). As
 each question resolves, append to `## Interview record` in the template's
 `Q / Recommended / Answer / Status` shape. Fill `## Problem`, `## Proposed
 outcome`, `## Affected users and systems`, `## Constraints` in the user's
@@ -101,8 +107,54 @@ words as they emerge. Set `title`, `description`, and `generated.by` /
 `generated.at` with `./scripts/fm.py set`. Set `sdd_context` on `intent.md`
 once the context is decided — `new-feature.sh` cannot know it.
 
-For a project-level grilling (no slice), write `docs/intent-<topic>.md` in the
-same shape with `type: Intent`.
+## Product-level grilling
+
+`sdd-init` Step 2 runs this skill before any structured question, on the
+product as a whole. The output is `docs/intent-product.md` (`type: Intent`,
+`resource: /docs/intent-product.md`, no `sdd_id`), in the same shape as a
+slice intent.
+
+The list under "What to grill on" is for a slice and is mostly wrong here.
+Product-level questions are wider and looser, and the first few should be
+open. Work down this instead:
+
+**The itch** — What are you trying to achieve? Not the product: the outcome.
+What is annoying, slow, impossible or expensive today? Who feels it? What
+happens if nothing changes?
+
+**The picture in your head** — Describe it as if it existed. What does
+someone do with it on a Tuesday? What is the first thing they see? What is
+the last thing before they close it?
+
+**Why now, why you** — What changed that makes this worth doing now? Have
+you tried something before? What exists that nearly does this, and why is it
+not enough?
+
+**Who** — Who uses it, who runs it, who pays for it, who is affected without
+touching it? Which of those is *you*?
+
+**Edges** — What is definitely not this? What would make you say "that's a
+different product"? What would you cut first?
+
+**Done** — What would you show someone to prove it works? What would make
+you abandon it?
+
+**Forces** — Anything already imposed: where it has to run, where data may
+live, what it has to talk to, when it needs to exist by, what it must cost.
+Only what is imposed. If the user starts choosing technology here, record it
+as their stated preference under Constraints and move on; do not follow it
+up. The stack is chosen at the first plan.
+
+**Worries** — What are you most unsure about? What do you expect to be hard?
+What would you least like to be wrong about?
+
+Push on the same things: "it should just work", "standard stuff", "the usual
+users". Recommend an answer to every question. Accept "I don't know" and
+record it. Stop when you could write the one-sentence description yourself
+and the user would not correct it.
+
+For any other project-level grilling (a big decision, a direction change),
+write `docs/intent-<topic>.md` the same way.
 
 When the tree is resolved:
 

@@ -1,7 +1,7 @@
 ---
 type: Skill
 name: sdd-engineering
-description: Establish, load, or refine the user's cross-project engineering preferences (paradigm, typing, errors, testing, architecture, tooling) — docs/engineering.md, mastered at ~/.config/sdd/engineering.md. Use during sdd-init, when docs/engineering.md is missing, when the user says "my coding preferences", "how I like code written", "engineering standards", or when a review surfaces a preference not yet recorded.
+description: Establish, load, or refine the user's cross-project engineering preferences (paradigm, typing, errors, testing, architecture, tooling) — docs/engineering.md, mastered at ~/.config/sdd/engineering.md. Use at the first sdd-plan when docs/engineering.md is missing or unapproved, when the user says "my coding preferences", "how I like code written", "engineering standards", or when a review surfaces a preference not yet recorded. Not during sdd-init.
 ---
 
 # Engineering preferences
@@ -9,6 +9,19 @@ description: Establish, load, or refine the user's cross-project engineering pre
 These do not change per project. They change slowly, across projects, as the
 user learns what they want. So: one master outside the repo, a copy inside,
 and a discipline for keeping them in step.
+
+## When this runs
+
+**At the first `sdd-plan`, and not before.** Nothing earlier in the workflow
+needs to know how code is written: the product brief, domain map,
+constitution, roadmap, glossary, intent and spec are all technology-free by
+design. The plan is the first artefact that chooses a stack, so the plan is
+the first thing that needs these preferences.
+
+Never run this interview during `sdd-init`. A user who has not yet said what
+they are building must not be asked which language they prefer. If a master
+file exists, `scripts/init.sh` copies it in silently; that is the only
+engineering activity init performs.
 
 ## Resolve
 
@@ -22,10 +35,29 @@ and a discipline for keeping them in step.
 ## Interview
 
 **Run on the strongest model available.** One question per section of
-`templates/engineering-template.md`, in order, **one at a time**, each with
-the template's default offered as the recommendation — the user confirms,
-changes, or replaces it. Their answer goes on the `**Mine:**` line in their
-words; a bare "yes" records "as default".
+`templates/engineering-template.md`, **one at a time**, each with the
+template's default offered as the recommendation — the user confirms,
+changes, or replaces it.
+
+**Order matters, and it is not the template's numeric order.** Ask the
+principles first, the stack last:
+
+1. §2 Paradigm, §3 Types, §4 Errors, §5 Immutability — how they think about
+   code, independent of any language.
+2. §6 Architecture, §7 Testing, §8 Data and interfaces — how they structure
+   and prove it.
+3. §9 Dependencies, §10 Style, §11 Observability, §12 Configuration,
+   §13 Git — the working habits.
+4. §15 Always / never — the things not covered above.
+5. **Last**, §1 Languages and §14 Tooling — and frame them as *what you reach
+   for*, not a decision for this project. By now you know the product's
+   constraints from `docs/product.md`; offer the languages and tools that fit
+   those, and record the user's general preference. The plan will choose this
+   project's stack from the constraints, with these as one input, and may
+   depart with a stated reason.
+
+Their answer goes on the `**Mine:**` line in their words; a bare "yes"
+records "as default".
 
 Push where an answer is vague ("good types" → *which* strict mode, *which*
 escape hatches are allowed). Accept "don't care" — record "no preference;
@@ -71,6 +103,8 @@ recurring review finding reveals a preference that is not written down.
 - The unlock file exists only between approval and commit.
 - The spec (`spec.md`) never reads this file and never cites it. Preferences
   are how, not what.
+- §1 and §14 are preferences, not decisions. A plan that picks a different
+  language for a good reason is not a violation; it names the reason.
 - The plan cites it: any plan choice that departs from a preference names the
   section and the reason, as an open question for the user.
 - Agents never edit this file outside this skill. The `guard-paths` hook

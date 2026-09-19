@@ -34,10 +34,13 @@ claude
 /sdd-init
 ```
 
-That interviews you for your engineering preferences (once ever, then reused
-across projects), the product brief, the domain map of bounded contexts,
-ratifies the constitution, decomposes the product into vertical slices, builds
-the glossary, and offers to start slice 1. From then on, describe what you
+That opens with a brainstorm about what you are trying to achieve, drafts the
+product brief from it, maps the bounded contexts, ratifies the constitution,
+decomposes the product into vertical slices, builds the glossary, and offers
+to start slice 1. None of it asks about technology. Your engineering
+preferences (once ever, then reused across projects) and this project's stack
+are settled at the first plan, once the product and its constraints exist to
+choose from. From then on, describe what you
 want; the `sdd` skill routes it.
 
 ## What is here
@@ -52,7 +55,8 @@ index.md                Bundle root. Declares okf_version.
 log.md                  Every gate passed, dated.
 memory/constitution.md  Project principles. Outranks everything, including you
                         mid-conversation. Amended deliberately, never by an agent.
-docs/product.md         What this is, for whom, constraints, lifecycle.
+docs/intent-product.md  The opening brainstorm, in your words.
+docs/product.md         What this is, for whom, imposed constraints, lifecycle.
 docs/roadmap.md         The vertical slices, in build order, with status.
 docs/glossary.md        Domain vocabulary. Specs and code use these words.
 docs/engineering.md     How you like code written. Copied from your master.
@@ -88,8 +92,8 @@ scripts/hooks/          PreToolUse path guard; PostToolUse formatter.
 | Skill | Does |
 |---|---|
 | `sdd` | Router. Reads repo state, right-sizes the change, dispatches. |
-| `sdd-init` | The door. Engineering prefs → product brief → domain map → constitution → roadmap → glossary. Once per project. |
-| `sdd-engineering` | Establishes, loads or refines your cross-project coding preferences. |
+| `sdd-init` | The door. Brainstorm → product brief → domain map → constitution → roadmap → glossary. Technology-free. Once per project. |
+| `sdd-engineering` | Establishes, loads or refines your cross-project coding preferences. Runs at the first plan, not at init. |
 | `sdd-constitution` | Establishes or amends the constitution. |
 | `grill` | Interviews you until the decision tree is resolved. Writes `intent.md` in your words. |
 | `ears` | Reference for writing testable requirements, and their scenarios. |
@@ -128,7 +132,7 @@ power follows.
 
 | Phase | Runs as | Model |
 |---|---|---|
-| `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan` | main session | strongest available |
+| `sdd-init`, `sdd-constitution`, `grill`, `sdd-specify`, `sdd-plan` (and `sdd-engineering`, which it runs) | main session | strongest available |
 | `sdd-tasks` | main session | strongest or mid |
 | `sdd-implement` (controller) | main session | mid or strongest |
 | `implementer` (per task) | subagent | mid (sonnet); `Trivial` → small |

@@ -46,12 +46,13 @@ for every decision and write each one down:
 
 | Level | Artefact | The agent asks you… |
 |---|---|---|
+| Brainstorm | `docs/intent-product.md` | what you are trying to achieve, in your words, before anything is structured |
 | Product | `docs/product.md` | what this is, for whom, what success means, what is out of scope for ever |
 | Domain | `docs/domain.md` | how the product divides into bounded contexts, what events pass between them, what must never be false |
-| Preferences | `docs/engineering.md` | how you like code written, once, then reused across every project |
 | Roadmap | `docs/roadmap.md` | which thin vertical slices to build, in what order, where the cut line is |
 | Slice intent | `specs/NNN/intent.md` | everything about one slice, in your words, recorded as you answer |
 | Specification | `specs/NNN/spec.md` | what and why, as testable requirements with Given/When/Then scenarios, no technology |
+| Preferences | `docs/engineering.md` | how you like code written, asked at the first plan, then reused across every project |
 | Plan | `specs/NNN/plan.md` | how: stack, data, interfaces, structure, every choice with its rejected alternative |
 | Tasks | `specs/NNN/tasks.md` | self-contained work units, each naming the scenario it proves |
 
@@ -89,7 +90,8 @@ Then, in the agent session:
 
 That is the only command you need to remember. It walks you through the opening
 interviews, which take about 45 minutes for a real product, ratifies the
-constitution, and offers to start the first slice. After that you just say what
+constitution, and offers to start the first slice. None of it asks about
+technology; that starts at the first plan. After that you just say what
 you want, and the `sdd` skill works out which phase you are in and routes you.
 
 `init.sh` seeds `docs/` from `templates/`, swaps this README for the project's
@@ -100,8 +102,8 @@ you have them, and makes the first commit.
 
 ```
                     ┌──────────────────────────────────────────────┐
-  once per project  │  /sdd-init                                   │
-                    │    engineering prefs, product brief,         │
+  once per project  │  /sdd-init            no technology yet      │
+                    │    brainstorm (grill), product brief,        │
                     │    domain map, constitution, roadmap,        │
                     │    glossary                                  │
                     └──────────────────┬───────────────────────────┘
@@ -110,6 +112,8 @@ you have them, and makes the first commit.
   once per slice    │  grill          → intent.md     (you talk)   │
                     │  sdd-specify    → spec.md       [GATE]       │
                     │  sdd-plan       → plan.md       [GATE]       │
+                    │       └ first time: engineering prefs, then  │
+                    │         the stack is chosen here             │
                     │  sdd-tasks      → tasks.md      [GATE]       │
                     │  sdd-implement  → code, one task at a time   │
                     │       ├ brief   → implementer (cheap model)  │
@@ -123,15 +127,24 @@ you have them, and makes the first commit.
 
 ### Per phase
 
-`sdd-init` is the door. Six interviews, one question at a time, each with the
-agent's recommended answer so you are reviewing a draft rather than filling in
-a form. The product brief. Your engineering preferences, skipped if you already
-have a master file. Domain discovery, where nouns become contexts, verbs become
-events, and "what must never be true" becomes invariants. The constitution,
-which is three project-specific articles on top of the fixed ones. The roadmap,
-which is the product decomposed into vertical slices, each thin, end to end,
-useful on its own, and belonging to exactly one context. The glossary, with
-every term scoped to a context, in your definition.
+`sdd-init` is the door, and it asks nothing about technology. It starts with a
+brainstorm: an open interview about what you are trying to achieve, what is
+annoying today, what the thing looks like in your head, who it is for, what
+would make you abandon it. That becomes `docs/intent-product.md` in your own
+words. The product brief is then drafted *from* that intent rather than asked
+from scratch, and you are only questioned on what the brainstorm left out.
+Domain discovery follows, where nouns become bounded contexts, verbs become
+events, and "what must never be true" becomes invariants. Then the
+constitution, which is three project-specific articles on top of the fixed
+ones. Then the roadmap, the product decomposed into vertical slices, each thin,
+end to end, useful on its own, and belonging to exactly one context. Then the
+glossary, with every term scoped to a context, in your definition.
+
+Every step of init is technology-free by design. Which language, which
+framework, which database, where it is hosted: none of those are answerable
+until the product, its constraints and its non-functional requirements exist,
+so none of them are asked. If you volunteer one, it is recorded as your stated
+preference and not followed up.
 
 `grill` runs for each slice: an interview that walks the decision tree top down
 through purpose, context, boundaries, actors, data, states, failure modes, the
@@ -145,6 +158,16 @@ Requirements go in EARS notation (`WHEN … THE SYSTEM SHALL …`), each with
 Given/When/Then scenarios carrying real values, including the failure paths. A
 Domain section names the context, the events, and the invariants. The most
 valuable section is the one listing what is explicitly out of scope. Gate.
+
+`sdd-plan` is where technology finally enters. On the first slice it runs the
+engineering-preferences interview if you have no master file yet, asking the
+principles first (paradigm, types, errors, testing) and the languages and
+tooling last, framed as what you reach for rather than a decision for this
+project. Then it chooses this project's stack, in order, from: the constraints
+the product brief recorded as imposed, the numbers in the spec's
+non-functional requirements, what each bounded context actually needs, your
+preferences, and whatever the repo already uses. The Approach paragraph has to
+say which of those drove the choice.
 
 `sdd-plan` turns the spec into `plan.md`: stack, data model, interfaces with
 their error shapes, events with their schemas, file structure mirroring the
@@ -189,7 +212,9 @@ nowhere else.
 
 | You are asked | When | Not asked again because |
 |---|---|---|
-| The big questions: what, for whom, contexts, invariants, preferences | `/sdd-init`, once | recorded in `docs/` and `docs/decisions.md` |
+| What you are trying to achieve, openly | `/sdd-init` step 2, once | recorded in `docs/intent-product.md` |
+| The big questions: what, for whom, contexts, invariants | `/sdd-init`, once | recorded in `docs/` and `docs/decisions.md` |
+| How you like code written | the first `sdd-plan`, once ever | recorded in `docs/engineering.md` and your master copy |
 | Everything about a slice | `grill`, once per slice | recorded in `intent.md` |
 | Approve or revise | each gate: spec, plan, tasks, and the init docs | approval is a `verified` stamp on the file |
 | A question the brief could not answer | mid-implementation, rarely | answered once, added to `decisions.md` |
@@ -220,6 +245,7 @@ docs/
   engineering.md        how you like code written, copied from your master
   roadmap.md            vertical slices in build order, with status
   glossary.md           the vocabulary, scoped per context
+  intent-product.md     the opening brainstorm, in your words
   decisions.md          append-only; every decision you have made
   adr/                  architecture decision records
   sdd-guide.md          the long-form guide to all of this

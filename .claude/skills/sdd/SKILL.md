@@ -35,8 +35,9 @@ Do this before asking the user anything:
 2. `docs/decisions.md` — read it. Nothing in it is asked again, in any phase.
 3. `memory/constitution.md` — `sdd_phase` not `ratified`, or contains
    `PLACEHOLDER`? Then `sdd-constitution` first.
-4. `docs/engineering.md` — missing or `sdd_phase` not `approved`? Then
-   `sdd-engineering` before any plan.
+4. `docs/engineering.md` — missing or `sdd_phase` not `approved`? Note it.
+   It is needed at `sdd-plan`, not earlier; `sdd-plan` runs
+   `sdd-engineering` itself. Never route to it before a spec is approved.
 5. `docs/roadmap.md` — which slices exist, and what is each one's status?
 6. `ls specs/` — for each slice, the `sdd_phase` of `intent.md`, `spec.md`,
    `plan.md`, `tasks.md` (`./scripts/fm.py get <file> sdd_phase`).
@@ -51,13 +52,12 @@ Running `./scripts/check-specs.sh` answers most of 3–7 in one call.
 |---|---|
 | `docs/product.md` missing or templated | `sdd-init` |
 | Constitution not ratified or has placeholders | `sdd-constitution` |
-| `docs/engineering.md` missing or not approved | `sdd-engineering` |
-| `docs/roadmap.md` has no approved slices | `sdd-init` (Step 4) |
+| `docs/roadmap.md` has no approved slices | `sdd-init` (Step 6) |
 | Request does not match a slice in `docs/roadmap.md` | Ask whether to add it to the roadmap, and where — then `grill` |
 | Slice exists, no `intent.md` or `intent.md` not `resolved` | `grill` |
 | `intent.md` resolved, no `spec.md` content | `sdd-specify` |
 | `spec.md` written, `sdd_phase` not `approved` | Present it for approval — **stop** |
-| `spec.md` approved, `plan.md` still template | `sdd-plan` |
+| `spec.md` approved, `plan.md` still template | `sdd-plan` (which runs `sdd-engineering` first if `docs/engineering.md` is missing or unapproved) |
 | `plan.md` written, `sdd_phase` not `approved` | Present it for approval — **stop** |
 | `plan.md` approved, `tasks.md` still template | `sdd-tasks` |
 | `tasks.md` approved, tasks with `**Status:** todo` remain | `sdd-implement` |
@@ -107,6 +107,9 @@ not refuse; the user decides.
 - Write implementation code in the same turn as writing a spec.
 - Answer the spec's own open questions yourself.
 - Put technology choices in `spec.md`, or restate requirements in `plan.md`.
+- Ask about languages, frameworks, databases or hosting before a spec is
+  approved. The first technology question in a project is asked by
+  `sdd-plan`.
 - Mark a task complete without running its verify command and showing output.
 - Renumber or delete an approved requirement ID.
 - Edit `memory/constitution.md`, `docs/engineering.md` or `REVIEW.md` outside

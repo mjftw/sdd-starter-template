@@ -27,6 +27,12 @@ master: ~/.config/sdd/engineering.md
 
 ## 1. Languages
 
+> What you reach for, not a decision. Each project's plan chooses its stack
+> from the product's imposed constraints and non-functional requirements,
+> with this as one input, and may depart with a stated reason. This section is
+> asked *last* in the interview, after everything above the line has been
+> established.
+
 **Default:** one primary language per project, chosen in the plan; a second
 only at a hard boundary (e.g. a native client).
 **Mine:**
@@ -133,6 +139,8 @@ attached; squash on merge. `main` always green.
 **Mine:**
 
 ## 14. Tooling per language
+
+> Also asked last, and only for the languages in §1.
 
 **Default:** one of each, the community standard, run by one `check` command.
 **Mine:**

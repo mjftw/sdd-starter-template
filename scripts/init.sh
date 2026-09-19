@@ -24,14 +24,14 @@ for t in product domain roadmap glossary; do
       "templates/${t}-template.md" > "docs/${t}.md"
 done
 
-# Engineering preferences: copy the master if one exists; otherwise /sdd-init
-# will interview for them.
+# Engineering preferences: copy the master if one exists. If not, the first
+# /sdd-plan interviews for them. Nothing before that needs them.
 MASTER="${SDD_ENGINEERING:-$HOME/.config/sdd/engineering.md}"
 if [[ -f "$MASTER" ]]; then
   cp "$MASTER" docs/engineering.md
   echo "engineering preferences: copied from $MASTER"
 else
-  echo "engineering preferences: no master at $MASTER — /sdd-init will interview"
+  echo "engineering preferences: none yet; the first plan will ask"
 fi
 
 # Fill the name and description where they appear.
