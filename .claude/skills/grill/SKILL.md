@@ -23,7 +23,8 @@ deletes whole branches below it.
 Loop until done:
 
 1. **Look before you ask.** If the answer is discoverable — in the codebase,
-   `docs/decisions.md`, `docs/product.md`, `docs/glossary.md`, the constitution,
+   `docs/decisions.md`, `docs/product.md`, `docs/domain.md`, `docs/glossary.md`,
+   the constitution,
    a prior spec, package manifests — go and read it. Say what you found. Never
    spend a question on something you could have looked up.
 2. **Ask the questions whose prerequisites are already settled.** Not everything
@@ -48,6 +49,13 @@ skipping it.
 
 **Purpose** — What breaks if we do not build this? Who complains today? What do
 they do instead right now? How will we know it worked?
+
+**Context** — Which bounded context in `docs/domain.md` owns this? Read the
+map first; recommend one. If the honest answer is "two", say so: it is
+either two slices or an integration slice whose only job is the event or
+interface between them — ask which. Which nouns from the context's Owns
+column does this touch? Which events does it emit or consume? Which
+invariants could it violate?
 
 **Boundaries** — What is explicitly *not* in this? What is the smallest version
 that is still useful? What would we cut first under time pressure?
@@ -90,7 +98,8 @@ each question resolves, append to `## Interview record` in the template's
 `Q / Recommended / Answer / Status` shape. Fill `## Problem`, `## Proposed
 outcome`, `## Affected users and systems`, `## Constraints` in the user's
 words as they emerge. Set `title`, `description`, and `generated.by` /
-`generated.at` with `./scripts/fm.py set`.
+`generated.at` with `./scripts/fm.py set`. Set `sdd_context` on `intent.md`
+once the context is decided — `new-feature.sh` cannot know it.
 
 For a project-level grilling (no slice), write `docs/intent-<topic>.md` in the
 same shape with `type: Intent`.
@@ -110,7 +119,8 @@ When the tree is resolved:
 6. Ask whether to proceed to `sdd-specify`.
 
 Before asking **any** question, read `docs/decisions.md`, `docs/product.md`,
-`docs/glossary.md`, and any existing `intent.md` for this slice. A recorded
+`docs/domain.md`, `docs/glossary.md`, and any existing `intent.md` for this
+slice. A recorded
 decision is never re-asked. If you believe one is wrong, say so once with your
 reason, then follow it (Article I).
 

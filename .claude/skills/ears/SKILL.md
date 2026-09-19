@@ -1,7 +1,7 @@
 ---
 type: Skill
 name: ears
-description: EARS (Easy Approach to Requirements Syntax) reference for writing unambiguous, testable requirements. Use whenever writing, reviewing or correcting a requirement or acceptance criterion, whenever a requirement reads vaguely, and whenever the words "requirement", "acceptance criteria", "EARS" or "SHALL" come up.
+description: EARS (Easy Approach to Requirements Syntax) reference for writing unambiguous, testable requirements, and how each maps to Given/When/Then scenarios. Use whenever writing, reviewing or correcting a requirement or acceptance criterion, whenever a requirement reads vaguely, and whenever the words "requirement", "acceptance criteria", "EARS" or "SHALL" come up.
 ---
 
 # EARS notation
@@ -99,6 +99,32 @@ Run this over every requirement before a spec goes to a gate:
 - [ ] Could be turned into a test by someone who has not read the rest of the spec
 - [ ] Has a matching unwanted-behaviour requirement, or a stated reason it needs none
 - [ ] Is not two requirements joined by "and"
+
+## EARS and scenarios
+
+EARS states the rule; a scenario is one concrete example that proves it.
+Every requirement has at least one scenario, usually one per path:
+
+```
+WHEN a client submits credentials
+THE SYSTEM SHALL validate them and return a signed session token
+
+REQ-004/S1 — valid credentials produce a session
+  Given user "ada" exists with password "correct-horse"
+  When "ada" submits password "correct-horse" from 203.0.113.9
+  Then the response is a session token valid for 7 days
+
+REQ-004/S2 — fifth failure in 15 minutes is rate-limited
+  Given four failed attempts from 203.0.113.9 in the last 14 minutes
+  When a fifth attempt arrives from 203.0.113.9
+  Then the response is 429 with Retry-After 60
+```
+
+Mapping: the EARS trigger (`WHEN`) is the scenario's **When**; the EARS
+precondition (`WHILE`/`WHERE`/`IF`) is the **Given**; the `SHALL` clause is
+the **Then**. Ubiquitous requirements (invariants) get a scenario per way the
+rule could be broken. A scenario's Then is always observable from outside the
+context — see the `bdd` skill.
 
 ## Provenance
 

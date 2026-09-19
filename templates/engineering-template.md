@@ -69,19 +69,24 @@ escape the function that does it. Shared mutable state needs a stated reason.
 
 ## 6. Architecture
 
-**Default:** vertical slices, not horizontal layers. Ports and adapters at
-every IO boundary (database, network, filesystem, clock, randomness) so the
-domain can be tested with fakes. No framework types in domain code.
+**Default:** bounded contexts from `docs/domain.md`, each under its own code
+root with a `published/` interface; vertical slices inside a context, not
+horizontal layers across the product. Ports and adapters at every IO boundary
+(database, network, filesystem, clock, randomness, other contexts) so the
+domain can be tested with fakes. No framework types in domain code. Contexts
+communicate by past-tense, schema-first events, translated at the consumer's
+adapter.
 **Mine:**
 
 ## 7. Testing
 
-**Default:** TDD — no production code without a failing test first (see the
-`tdd` skill). Test behaviour at the boundary, not implementation detail.
-Real dependencies over mocks where cheap (an in-memory or containerised
-database beats a mocked repository); fakes at ports where not. Property-based
-tests where inputs are structured data. Coverage is measured by requirement
-traceability, not a percentage.
+**Default:** TDD — no production code without a failing test first (`tdd`
+skill). Tests are the spec's scenarios (`bdd` skill): one per
+Given/When/Then, named after its ID, exercising the context through its
+published interface only, so the implementation can be rewritten without
+touching the test. Fakes at ports (in-memory repository, settable clock),
+never mocks asserting on internal calls. Property-based tests for invariants.
+Coverage is scenario traceability, not a percentage.
 **Mine:**
 
 ## 8. Data and interfaces

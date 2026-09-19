@@ -14,8 +14,11 @@ tags: [sdd, review]
 
 ## Passes — run all, in this order
 
-1. **Spec compliance** — every `REQ-` in `spec.md`: implemented, tested, every
-   acceptance criterion met including failure cases and exact values.
+1. **Spec compliance** — every `REQ-` in `spec.md`: implemented; every
+   scenario `REQ-N/Sk` has a test citing it verbatim (`scripts/check-scenarios.sh`);
+   every scenario's Then holds with the exact values. A test coupled to
+   implementation (imports internals, patches inside the context, asserts on
+   calls, reads private state) does not count as covering its scenario.
 2. **Constitution compliance** — each article, in turn. A violation is critical
    regardless of test results.
 2b. **Engineering preferences** — the diff follows `docs/engineering.md`; each
@@ -23,6 +26,12 @@ tags: [sdd, review]
    approved, or is a finding (important).
 3. **Plan conformance** — file structure, stack, dependencies, interfaces
    (including error shapes) match `plan.md`.
+3b. **Domain boundaries** — `scripts/check-contexts.sh` clean; emitted events
+   are past-tense, in this context's language, schema-first under
+   `published/`; consumed events are translated at an adapter and their shape
+   does not appear in domain code; every invariant in `docs/domain.md` that
+   this slice could touch has a test that tries to break it. A boundary
+   violation is critical.
 4. **Bugs and logic errors** — off-by-one, unhandled state, race, wrong
    default, silent failure.
 5. **Security** — input validation at boundaries, authz on every new surface,

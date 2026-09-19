@@ -1,7 +1,7 @@
 ---
 type: Skill
 name: sdd-init
-description: Onboard a fresh repository created from the starter — product brief, engineering preferences, constitution, roadmap of vertical slices, glossary — before any slice is specified. Use on a new project, when docs/product.md is missing or still a template, or when the user says "init", "set up the project", "new project", "let's start", or describes an app they want to build and no specs exist yet.
+description: Onboard a fresh repository created from the starter — product brief, engineering preferences, domain map of bounded contexts, constitution, roadmap of vertical slices, glossary — before any slice is specified. Use on a new project, when docs/product.md is missing or still a template, or when the user says "init", "set up the project", "new project", "let's start", or describes an app they want to build and no specs exist yet.
 ---
 
 # Init — the opening interview
@@ -52,39 +52,73 @@ approval run `./scripts/approve.sh docs/product.md approved`, then
 `./scripts/index.sh`, and append each decision to `docs/decisions.md` as
 `<date> · init · <decision> · <why>`.
 
-## Step 4 — Constitution
+## Step 4 — Domain discovery → `docs/domain.md`
+
+Read the `ddd` skill. Then, from the product brief, propose a first cut of
+bounded contexts and interrogate it, one question at a time, recommended
+answer attached:
+
+1. **Nouns.** List every noun in the brief. Group the ones that change
+   together and are described by the same people. Each group is a candidate
+   context. Ask: "Does *<noun>* mean the same thing everywhere, or does it
+   mean something different to <group A> than to <group B>?" A different
+   meaning is a context boundary.
+2. **Verbs → events.** For each context, what happens that other parts of the
+   product need to know about? Name each as a past-tense fact in that
+   context's words. Ask: "When <event>, who needs to know, and what do they
+   need from it?"
+3. **Rules.** For each context: "What must never be true? What would be a
+   bug in the data, not just in the code?" Each answer is an invariant.
+4. **Roots.** Propose a code root per context (`src/<name>/`). Confirm.
+5. **Shared.** Anything that genuinely must be identical across contexts.
+   Push back on each one.
+
+Write the file. Three to seven contexts is normal; one is fine for a small
+product. Fill `title`, `description`, `generated.*` with `fm.py set`.
+
+**Gate**: show it in full; *Approve* / *Revise* / *Merge two contexts* /
+*Split one*. On approval `./scripts/approve.sh docs/domain.md approved`,
+`./scripts/index.sh`, append decisions.
+
+The roadmap (next step) tags every slice with its context, and the glossary
+(after that) scopes every term to one.
+
+## Step 5 — Constitution
 
 Hand to `sdd-constitution`. Return here when it is ratified.
 
-## Step 5 — Roadmap → `docs/roadmap.md`
+## Step 6 — Roadmap → `docs/roadmap.md`
 
 Decompose the product into **vertical slices**: each thin, end-to-end, and
 demonstrably useful alone. Not layers ("database", "API", "UI") — outcomes
 ("a reading can be recorded and seen").
 
-Propose a first cut of 3–8 slices, ordered, one-line outcome each, with the
-dependencies between them. Then interrogate it with the user, one question at a
-time:
+Propose a first cut of 3–8 slices, ordered, one-line outcome each, **the
+context each belongs to**, and the dependencies between them. Then interrogate
+it with the user, one question at a time:
 
 - Is slice 1 the smallest thing that is still useful to you?
 - Which slice would you cut if you had half the time? (That is the cut line.)
 - Does any slice depend on a decision we have not made?
 - Is anything here really two slices? Really none?
+- Does any slice span two contexts? Then it is two slices, or an integration
+  slice.
 
 Write the file with every slice `proposed`. **Gate**: *Approve* / *Revise* /
 *Re-order*. On approval `./scripts/approve.sh docs/roadmap.md approved`, then
 `./scripts/index.sh`; append decisions.
 
-## Step 6 — Glossary → `docs/glossary.md`
+## Step 7 — Glossary → `docs/glossary.md`
 
-List the nouns that appeared in Steps 3–5. For each, ask for the definition the
-*user* uses, and what it must not be confused with. Specs and code will use
-these terms exactly. Write the file. **Gate**: *Approve* / *Revise*, then
+List the nouns that appeared in Steps 3–6. For each, ask which context it
+belongs to and for the definition the *user* uses in that context, and what it
+must not be confused with. Specs and code will use these terms exactly.
+Write the file. **Gate**: *Approve* / *Revise*, then
 `./scripts/approve.sh docs/glossary.md approved` and `./scripts/index.sh`.
 
-## Step 7 — Hand off
+## Step 8 — Hand off
 
-Commit: `docs(init): product brief, engineering, roadmap, glossary`.
+Commit: `docs(init): product brief, engineering, domain, roadmap, glossary`.
 
 Summarise in five lines: the product in one sentence; N slices and which is
 first; the riskiest assumption; the open questions. Then offer to start slice 1

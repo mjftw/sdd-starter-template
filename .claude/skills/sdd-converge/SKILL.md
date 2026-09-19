@@ -24,8 +24,10 @@ The policy — which passes, severities, thresholds, exclusions — is
 
 Your job in the main session:
 
-1. Spawn `reviewer` (Agent tool, `subagent_type: reviewer`) with the slice path
-   and the instruction to apply `REVIEW.md` and write its report to
+1. Spawn `reviewer` (Agent tool, `subagent_type: reviewer`) with the slice
+   path and the instruction to apply `REVIEW.md`, run
+   `./scripts/check-scenarios.sh specs/<slice>` and
+   `./scripts/check-contexts.sh`, and write its report to
    `.sdd/reports/<slice>/converge.md`.
 2. Receive the report. Do not edit it, soften it, or "fix a couple of things
    first".
@@ -34,9 +36,9 @@ Your job in the main session:
 ## Checks
 
 The reviewer runs the passes in `REVIEW.md`. For reference, the shape:
-spec compliance → constitution → engineering preferences → plan conformance →
-bugs → security → scope → hygiene → notes fold-back. Severities and thresholds
-are in `REVIEW.md`.
+spec compliance (scenario coverage) → constitution → engineering preferences →
+plan conformance → domain boundaries → bugs → security → scope → hygiene →
+notes fold-back. Severities and thresholds are in `REVIEW.md`.
 
 Secrets, keys or credentials found anywhere in the tree are reported
 immediately and separately, before anything else.
@@ -51,6 +53,13 @@ Run: <date> · Commit: <sha>
 |---|---|---|---|
 | REQ-001 | ✅ src/auth.py:42 | ✅ test_auth.py::test_login | ✅ |
 | REQ-002 | ⚠️ partial | ❌ | ❌ 429 case missing |
+
+| Scenario | Test | Through public interface? |
+|---|---|---|
+| REQ-001/S1 | ✅ tests/auth/scenarios/test_login.py::test_REQ_001_S1_… | ✅ |
+| REQ-001/S2 | ❌ none | — |
+
+Domain boundaries: `check-contexts.sh` ✅ / ❌ (findings below)
 
 ### Critical (N)
 - <finding> — <file:line> — <what the artefact requires> — <what the code does>

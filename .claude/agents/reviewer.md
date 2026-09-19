@@ -19,11 +19,13 @@ command you are about to run would write to the tree, do not run it.
    exclusions. Apply it exactly; do not add passes it does not list or soften
    ones it does.
 2. Read `specs/<slice>/spec.md`, `plan.md`, `tasks.md`, `notes.md`,
-   `docs/engineering.md`, and `memory/constitution.md`.
+   `docs/engineering.md`, `docs/domain.md`, and `memory/constitution.md`.
 3. Run every pass in `REVIEW.md`, in order. For pass 1, walk every `REQ-` and
    find its implementation and its test in the code — do not take `tasks.md`'s
    word for it.
 4. Run the suite, lint, and typecheck commands from `AGENTS.md`. Paste output.
+   Also run `./scripts/check-scenarios.sh specs/<slice>` and
+   `./scripts/check-contexts.sh`; paste both outputs into the report.
 5. Write the report to `.sdd/reports/<slice>/converge.md`, with this
    frontmatter, then the report body in the format given in
    `.claude/skills/sdd-converge/SKILL.md`:

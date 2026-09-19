@@ -18,7 +18,10 @@ Produce `specs/NNN-slug/spec.md`: what we are building and why. **No technology.
    `docs/decisions.md`, and this slice's `intent.md`. If `intent.md` is missing
    or its `sdd_phase` is not `resolved`, stop and run `grill`. Do not re-ask
    anything `intent.md` answers.
-5. Read the `## Outcome` and requirement headings of every other spec whose
+5. Read `docs/domain.md` and the `ddd` and `bdd` skills. Copy `sdd_context`
+   from `intent.md` to `spec.md` (`fm.py set`). Read the context's row in the
+   map and its invariants.
+6. Read the `## Outcome` and requirement headings of every other spec whose
    `sdd_phase` is `approved`. This slice must be consistent with them and must
    use glossary terms exactly.
 
@@ -39,14 +42,19 @@ the next:
    the document. An agent fills unstated gaps with guesses; this is where you
    pre-empt them. Be generous here.
 4. **Relationship to other slices** — depends on, affects, shares terms.
-5. **Requirements** — EARS, one ID each. For each one, immediately write its
-   acceptance criteria, including the failure case and the actual values.
-6. **Non-functional requirements** — only the ones with a number. Delete the rest
+5. **Domain** — context, nouns touched, events emitted/consumed, invariants
+   preserved and introduced. Every invariant that this slice could violate
+   becomes a ubiquitous requirement below.
+6. **Requirements** — EARS, one ID each. For each one, immediately write its
+   **scenarios**: Given / When / Then with real values, one per acceptance path
+   *including the failure paths*, each with an ID `REQ-00N/Sk`. A requirement
+   with no failure scenario needs a stated reason.
+7. **Non-functional requirements** — only the ones with a number. Delete the rest
    of the table rather than filling it with "N/A" theatre.
-7. **Edge cases** — walk the table: empty, concurrent, dependency down, hostile
+8. **Edge cases** — walk the table: empty, concurrent, dependency down, hostile
    input, partial failure. Each row becomes a requirement or an accepted risk.
-8. **Assumptions** — everything you are taking as true without verifying.
-9. **Open questions** — with your recommended answer for each.
+9. **Assumptions** — everything you are taking as true without verifying.
+10. **Open questions** — with your recommended answer for each.
 
 Set `title`, `description` and `generated.by` / `generated.at` with
 `./scripts/fm.py set`.
@@ -64,6 +72,11 @@ Set `title`, `description` and `generated.by` / `generated.at` with
   recording it as decided is not. The user decides.
 - **Coverage before elegance.** A spec with six blunt requirements and a full
   edge-case table beats one with twenty beautifully worded happy paths.
+- **Scenarios are observable from outside the context.** If a Then can only be
+  checked by looking at internal state, it is not a scenario — restate it in
+  terms of what a caller sees.
+- **Glossary words, in this context's meaning.** Not synonyms, not the
+  "technical" name.
 - Aim for the smallest spec that leaves nothing to guess. Length is not the goal;
   absence of ambiguity is.
 
@@ -73,6 +86,7 @@ Write the file, then report in at most five lines:
 
 - The slice this covers, and what is deliberately deferred
 - Anything you decided that the user did not specify
+- Context, and any invariant this slice introduces
 - The open questions, numbered
 - The riskiest assumption
 

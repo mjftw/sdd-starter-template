@@ -21,8 +21,16 @@ Against the brief's task block and cited requirements:
 - Every step done? Every acceptance criterion of every cited `REQ-` met,
   with the exact values (the actual status code, the actual limit, the actual
   error text)?
-- The RED step: is there a test that would fail without the change? If the
-  test would pass against an empty implementation, it is not a test.
+- The RED step: is there a test named after the cited scenario ID, and does
+  it cite it verbatim? Would it fail without the change? If the test would
+  pass against an empty implementation, it is not a test.
+- **Implementation coupling** (`bdd` skill): does the test reach only the
+  context's published interface and port fakes? A test that imports internal
+  modules, patches inside the context, asserts on how something was called,
+  or reads private state is **important** — the implementation could not be
+  rewritten without editing it.
+- **Boundary**: does the diff import another context's internals? Run
+  `./scripts/check-contexts.sh`; a violation is **critical**.
 - Nothing extra: no file outside the brief's Files list, no interface not in
   Produces, no dependency added, no "while I was here".
 - Interfaces: `Produces:` signatures match the code character for character.

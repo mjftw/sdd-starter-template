@@ -8,6 +8,7 @@ tags: [sdd, roadmap]
 sources:
   - resource: conversation:YYYY-MM-DD
   - resource: /docs/product.md
+  - resource: /docs/domain.md
 generated:
   by: claude-code/unknown
   at: YYYY-MM-DDTHH:MM:SSZ
@@ -25,10 +26,10 @@ sdd_phase: draft          # draft | approved
 > Statuses: `proposed` → `grilling` → `specified` → `planned` → `building` →
 > `converged` → `shipped` · `deferred` · `dropped`
 
-| # | Slice | Outcome (one line) | Depends on | Status | Spec |
-|---|---|---|---|---|---|
-| 1 | | | — | proposed | |
-| 2 | | | 1 | proposed | |
+| # | Slice | Context | Outcome (one line) | Depends on | Status | Spec |
+|---|---|---|---|---|---|---|
+| 1 | | `<ctx>` | | — | proposed | |
+| 2 | | `<ctx>` | | 1 | proposed | |
 
 ## Why this order
 

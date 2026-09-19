@@ -38,9 +38,10 @@ So each task carries everything it needs:
 - **Files** — exact paths. `Create:` / `Modify: path:lines` / `Test:`.
 - **Interfaces** — `Consumes:` exact signatures from earlier tasks;
   `Produces:` exact signatures this task exposes. Character-for-character.
-- **Steps** — 3–8, each 2–5 minutes, checkbox-numbered. TDD-shaped: RED
-  (the actual test code, not a description) → run, expect *this* failure →
-  GREEN → run, expect pass, suite green → REFACTOR.
+- **Steps** — 3–8, each 2–5 minutes, checkbox-numbered. TDD-shaped and
+  scenario-driven: RED names the scenario ID (`REQ-00N/Sk`) and gives the
+  actual test code, through the published interface (`bdd` skill) → run,
+  expect *this* failure → GREEN → run, expect pass, suite green → REFACTOR.
 - **Verify** — the exact command and the exact expected output.
 
 **No placeholders.** Automatic failures: "add error handling", "handle edge
@@ -74,6 +75,9 @@ Run these over the whole file and fix what fails before presenting:
   returns nothing outside the template's own guidance block.
 - **Granularity** — no step you could not do in five minutes; no task with
   one step.
+- **Scenario coverage** — every scenario ID in the spec appears in some task's
+  RED step. `./scripts/check-scenarios.sh specs/NNN-slug` reports gaps once
+  tests exist; before that, grep the spec's IDs against `tasks.md`.
 - **Preference conformance** — steps follow `docs/engineering.md` (types,
   error style, test style). A departure is a plan open question, not a task.
 
