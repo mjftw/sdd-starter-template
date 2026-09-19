@@ -13,6 +13,7 @@ generated:
   at: YYYY-MM-DDTHH:MM:SSZ
 verified: []
 sdd_id: NNN-slug
+sdd_context: <context>
 sdd_phase: draft          # draft | approved | in-progress | complete
 ---
 
@@ -30,6 +31,9 @@ sdd_phase: draft          # draft | approved | in-progress | complete
 > `[P]` after the ID: no dependency on the neighbouring `[P]` tasks.
 >
 > Status per task: `todo` · `in-progress` · `done` · `blocked`.
+>
+> Every RED step names the scenario ID it proves. A task with no scenario is
+> Foundations or Hardening.
 
 ## Phase 1 — Foundations
 
@@ -49,7 +53,7 @@ _Nothing user-visible. Scaffolding, types, schema, test harness._
 - Produces: `def name(arg: Type) -> Return` — <one line on semantics>
 
 **Steps**
-- [ ] 1. RED — write the failing test (the actual test code):
+- [ ] 1. RED — scenario REQ-00X/S1: write the failing test, named after the scenario, through the published interface (the actual test code):
   ```
   <test code>
   ```

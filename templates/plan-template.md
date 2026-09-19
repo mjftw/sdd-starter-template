@@ -14,6 +14,7 @@ generated:
   at: YYYY-MM-DDTHH:MM:SSZ
 verified: []
 sdd_id: NNN-slug
+sdd_context: <context>
 sdd_phase: draft          # draft | in-review | approved
 ---
 
@@ -88,10 +89,28 @@ strategy if this changes existing data. Say what is indexed and why.>
 schemas. Include error shapes — an interface without its failure responses is
 half-specified.>
 
+Events this slice emits or consumes are listed with their schema path. A
+consumed event from another context is translated into this context's own types
+at the adapter — never used raw inside the domain.
+
 ## Structure
 
+> Mirrors `docs/domain.md`. Everything this slice adds lives under its
+> context's code root. Anything another context may use goes under
+> `published/` (the context's interface and event schemas); everything else is
+> internal and `scripts/check-contexts.sh` will fail a cross-context import of
+> it. Inside the root, ports & adapters per engineering §6: pure domain, ports
+> as interfaces, adapters at the edge.
+
 ```
-<the files and directories this feature adds or changes, as a tree>
+src/<context>/
+  published/        ← interface + event schemas other contexts may depend on
+  domain/           ← pure: the nouns, the invariants, no IO
+  ports/            ← interfaces the domain needs (repo, clock, bus…)
+  adapters/         ← implementations of ports; translation from other contexts' events
+tests/<context>/
+  scenarios/        ← one test per spec scenario, through the published interface or driving port
+  invariants/       ← property/invariant tests
 ```
 
 ## Requirement → design mapping

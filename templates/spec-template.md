@@ -14,6 +14,7 @@ generated:
   at: YYYY-MM-DDTHH:MM:SSZ
 verified: []
 sdd_id: NNN-slug
+sdd_context: <context>
 sdd_phase: draft          # draft | in-review | approved | implemented | superseded
 sdd_constitution: 0.1.0
 ---
@@ -55,6 +56,19 @@ whether it happened. One paragraph.>
 | Affects | | |
 | Shares terms | | (from `docs/glossary.md`) |
 
+## Domain
+
+> From `docs/domain.md`. One context per slice. If this slice needs two, stop:
+> either it is two slices, or it is an integration slice whose only job is the
+> event/interface between them.
+
+- **Context:** `<name>`
+- **Nouns touched:** <from the context's Owns column; glossary terms exactly>
+- **Events emitted:** `<NounVerbed>` — <when>
+- **Events consumed:** `<NounVerbed>` from `<context>` — <what we do with it>
+- **Invariants this slice must preserve:** <from the map; each becomes a REQ below>
+- **New invariants this slice introduces:** <each becomes a REQ and a row in the map>
+
 ## Requirements
 
 > EARS notation. `SHALL` only. Each has an ID that never changes once approved;
@@ -66,9 +80,17 @@ whether it happened. One paragraph.>
 
 THE SYSTEM SHALL <observable behaviour>
 
-**Acceptance criteria**
-- [ ] <checkable, specific, includes the values>
-- [ ] <the failure case, and what the user sees>
+**Scenarios** — Given / When / Then, real values, observable from outside the
+context. One per acceptance path, including the failure paths.
+
+- **REQ-001/S1 — <scenario name>**
+  Given <starting state, concrete>
+  When <the trigger, concrete>
+  Then <the observable outcome, with the actual values>
+- **REQ-001/S2 — <failure scenario name>**
+  Given <state>
+  When <trigger that should be rejected>
+  Then <the rejection, exactly as the user sees it>
 
 **Traces to:** <task IDs, filled in by /sdd-tasks>
 
@@ -77,8 +99,12 @@ THE SYSTEM SHALL <observable behaviour>
 WHEN <trigger>
 THE SYSTEM SHALL <response>
 
-**Acceptance criteria**
-- [ ]
+**Scenarios**
+
+- **REQ-002/S1 — <name>**
+  Given
+  When
+  Then
 
 **Traces to:**
 

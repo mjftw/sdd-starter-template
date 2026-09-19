@@ -14,6 +14,7 @@ generated:
   at: YYYY-MM-DDTHH:MM:SSZ
 verified: []
 sdd_id: NNN-slug
+sdd_context: <context>
 sdd_phase: draft          # draft | resolved
 ---
 
