@@ -38,6 +38,17 @@ else
 fi
 
 echo
+echo "Domain map"
+if [[ ! -f docs/domain.md ]]; then
+  warn "docs/domain.md missing — /sdd-init step 4"
+elif [[ "$(./scripts/fm.py get docs/domain.md sdd_phase 2>/dev/null)" != "approved" ]]; then
+  warn "docs/domain.md is not approved"
+else
+  nctx=$(awk -F'|' '/^## Contexts/{p=1;next} p&&/^## /{exit} p&&NF>6&&$2!~/Context|---/{n++} END{print n+0}' docs/domain.md)
+  echo "  ✅ approved ($nctx contexts)"
+fi
+
+echo
 echo "AGENTS.md"
 if grep -q "FILL THIS IN" AGENTS.md 2>/dev/null; then
   warn "AGENTS.md Commands/Conventions/Architecture still unfilled"
@@ -99,6 +110,13 @@ for d in specs/[0-9][0-9][0-9]-*/; do
     warn "$id is not listed in docs/roadmap.md"
   fi
 
+  ctx=$(./scripts/fm.py get "$d/spec.md" sdd_context 2>/dev/null || echo "")
+  if [[ -z "$ctx" || "$ctx" == "<context>" ]]; then
+    [[ "$status" == "draft" ]] || warn "spec has no sdd_context"
+  elif [[ -f docs/domain.md ]] && ! grep -qE "^\| *\`?$ctx\`? *\|" docs/domain.md; then
+    bad "sdd_context '$ctx' is not a context in docs/domain.md"
+  fi
+
   reqs=$(grep -cE '^### REQ-[0-9]+' "$d/spec.md" || true)
   if [[ "$reqs" -eq 0 ]]; then
     bad "spec.md has no REQ- requirements"
@@ -127,6 +145,10 @@ for d in specs/[0-9][0-9][0-9]-*/; do
   fi
 
   if $UNTOUCHED; then echo; continue; fi
+
+  for r in $(grep -oE '^### REQ-[0-9]+' "$d/spec.md" | sed 's/### //'); do
+    grep -qE "$r/S[0-9]+" "$d/spec.md" || warn "$r has no scenario"
+  done
 
   # Open questions left in an approved spec.
   if [[ "$status" == "approved" ]]; then

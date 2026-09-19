@@ -28,6 +28,7 @@ nothing and buys provenance, trust and progressive disclosure.
 | `verified` | List of `{by, at}`. **A gate approval is a `human:<id>` entry**, appended by `scripts/approve.sh`. Trust tier is derived, not stored: no `verified` → unverified; only non-human actors → machine-confirmed; any `human:` → human-reviewed. |
 | `stale_after` | Only on ephemeral `.sdd/` artefacts. |
 | `sdd_id` | Slice id `NNN-slug`. |
+| `sdd_context` | The bounded context (from `docs/domain.md`) a slice artefact belongs to. |
 | `sdd_phase` | Workflow state, finer than OKF's `status`. Values per type below. |
 | `sdd_constitution` | Constitution version a spec was written against. |
 | `sdd_version` | Semver of the constitution / engineering preferences themselves. |
@@ -43,6 +44,7 @@ Extension keys are flat and `sdd_`-prefixed so `grep` and `sed` keep working.
 | `docs/roadmap.md` | `Roadmap` | `draft \| approved` |
 | `docs/glossary.md` | `Glossary` | `draft \| approved` |
 | `docs/engineering.md` | `Engineering Preferences` | `draft \| approved` (+ `sdd_version`) |
+| `docs/domain.md` | `Domain Map` | `draft \| approved` |
 | `docs/decisions.md` | `Decision Log` | — |
 | `REVIEW.md` | `Review Policy` | — |
 | `docs/sdd-guide.md`, `docs/okf.md` | `Guide` | — |

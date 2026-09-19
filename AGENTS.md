@@ -30,6 +30,9 @@ If 4 conflicts with 1–3, stop and say so. Do not pick silently.
 - `docs/glossary.md` — the domain vocabulary. Use these words exactly.
 - `docs/engineering.md` — how code is written here: paradigm, types, errors,
   testing, tooling. Follow it.
+- `docs/domain.md` — the bounded contexts, their code roots, the events between
+  them, the invariants. A slice belongs to one. Code never crosses a context
+  except through `published/`.
 - `docs/decisions.md` — every decision the user has made. Never re-ask one.
 - `specs/NNN-slug/` — per slice: `intent.md`, `spec.md`, `plan.md`, `tasks.md`,
   `notes.md`.
@@ -91,6 +94,10 @@ Run `check` before calling any task done, and paste the output.
   their skills; propose instead.
 - Hand-edit YAML frontmatter, `index.md` or `log.md`. Use `scripts/fm.py`,
   `scripts/approve.sh`, `scripts/index.sh`.
+- Import another context's internals; only its `published/` interface or its
+  events. `scripts/check-contexts.sh` fails otherwise.
+- Write a test that reaches inside the context. Tests go through the published
+  interface (`bdd` skill).
 - Rewrite an approved spec in place; propose a delta.
 - Invent a requirement, a command, or a convention. Ask.
 - Add a feature, abstraction, or dependency the spec and plan do not name.

@@ -35,9 +35,10 @@ claude
 ```
 
 That interviews you for your engineering preferences (once ever, then reused
-across projects), the product brief, ratifies the constitution, decomposes the
-product into vertical slices, builds the glossary, and offers to start slice 1.
-From then on, describe what you want; the `sdd` skill routes it.
+across projects), the product brief, the domain map of bounded contexts,
+ratifies the constitution, decomposes the product into vertical slices, builds
+the glossary, and offers to start slice 1. From then on, describe what you
+want; the `sdd` skill routes it.
 
 ## What is here
 
@@ -55,6 +56,7 @@ docs/product.md         What this is, for whom, constraints, lifecycle.
 docs/roadmap.md         The vertical slices, in build order, with status.
 docs/glossary.md        Domain vocabulary. Specs and code use these words.
 docs/engineering.md     How you like code written. Copied from your master.
+docs/domain.md          Bounded contexts, their code roots, events, invariants.
 docs/decisions.md       Append-only log of every decision you have made.
 docs/okf.md             The artefact frontmatter and what each field means.
 docs/adr/               Architecture Decision Records.
@@ -68,6 +70,8 @@ templates/              What the skills fill in.
 scripts/init.sh         One-time instantiation of a new project.
 scripts/new-feature.sh  Allocates the next NNN and seeds the slice.
 scripts/check-specs.sh  Static lint over the artefact tree.
+scripts/check-contexts.sh  Fails a cross-context import that bypasses published/.
+scripts/check-scenarios.sh Every spec scenario has a test citing it.
 scripts/fm.py           The only way frontmatter is edited.
 scripts/approve.sh      The only way a gate is passed.
 scripts/index.sh        Regenerates index.md files from frontmatter.
@@ -84,11 +88,13 @@ scripts/hooks/          PreToolUse path guard; PostToolUse formatter.
 | Skill | Does |
 |---|---|
 | `sdd` | Router. Reads repo state, right-sizes the change, dispatches. |
-| `sdd-init` | The door. Engineering prefs → product brief → constitution → roadmap → glossary. Once per project. |
+| `sdd-init` | The door. Engineering prefs → product brief → domain map → constitution → roadmap → glossary. Once per project. |
 | `sdd-engineering` | Establishes, loads or refines your cross-project coding preferences. |
 | `sdd-constitution` | Establishes or amends the constitution. |
 | `grill` | Interviews you until the decision tree is resolved. Writes `intent.md` in your words. |
-| `ears` | Reference for writing testable requirements. |
+| `ears` | Reference for writing testable requirements, and their scenarios. |
+| `ddd` | The four parts of DDD we use — contexts, language, events, invariants — and what we skip. |
+| `bdd` | Scenarios → tests that survive a rewrite. Doubles only at ports. |
 | `sdd-specify` | Writes `spec.md`. |
 | `sdd-plan` | Writes `plan.md`. |
 | `sdd-tasks` | Writes `tasks.md`. |
@@ -181,6 +187,37 @@ frontmatter, one `type` per artefact kind (`Intent`, `Specification`,
 `scripts/approve.sh` is the only way a gate is passed; `scripts/fm.py` the
 only way frontmatter is edited. Types and fields: [docs/okf.md](okf.md).
 
+## Domains and behaviours
+
+Two disciplines run through every phase, deliberately kept to their most
+useful parts.
+
+**Domain-driven design — four ideas, no vocabulary tax.** During `sdd-init`
+the product is divided into **bounded contexts** (`docs/domain.md`): named
+areas that each own one model and one vocabulary, with a code root each.
+Every slice belongs to exactly one. Contexts talk through **past-tense,
+schema-first events** and never by importing each other's internals —
+`scripts/check-contexts.sh` fails the build if they do. The **glossary is
+scoped per context**, so the same word can mean two things in two places
+and the code in each uses its own. Each context lists its **invariants** —
+the rules that must never be false — and every one becomes a requirement
+and a test that tries to break it. Entities vs value objects, repositories,
+strategic-pattern names, event-storming workshops: skipped. The `ddd` skill
+says why.
+
+**Behaviour-driven tests — the spec's scenarios, executable.** Every
+requirement in a spec carries Given/When/Then **scenarios** with real
+values, one per path including failures, each with an ID like
+`REQ-004/S2`. A test is one scenario, named after it, driving the context
+through its **published interface only**. The litmus, from the `bdd` skill:
+*could the implementation be rewritten from scratch and this test still
+pass unedited?* A test that imports internals, patches inside the context,
+or asserts on how something was called fails review. Fakes live at ports
+(an in-memory repository, a settable clock); mocks that verify calls are
+forbidden. `scripts/check-scenarios.sh` is the coverage metric — every
+scenario has a test — and replaces line coverage. Gherkin runners are
+optional; the discipline is not.
+
 ## Why it is shaped this way
 
 The rigour level here is **spec-anchored**: specs persist as a governing
@@ -241,6 +278,10 @@ and run them in CI on any change to `AGENTS.md`, skills, or hooks.
   wrong*: [Anthropic, The AI-Native SDLC playbook](https://claude.com/blog/the-ai-native-sdlc-playbook).
 - Artefact format: [Open Knowledge Format v0.2](https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf),
   Google Cloud (Apache-2.0).
+- Bounded contexts, ubiquitous language, domain events, invariants: Evans,
+  *Domain-Driven Design* (2003); Vernon, *Implementing DDD* (2013). Applied to
+  agent codebases per [Golovko, From Prompt Spaghetti to Bounded Contexts](https://gitnation.com/contents/from-prompt-spaghetti-to-bounded-contexts-ddd-for-agentic-codebases).
+- Given/When/Then scenarios: North, *Introducing BDD* (2006).
 - EARS: Mavin et al., Rolls-Royce, 2009. Popularised for agent work by AWS Kiro.
 - `AGENTS.md` is stewarded by the Agentic AI Foundation (Linux Foundation).
 
