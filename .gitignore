@@ -1,0 +1,25 @@
+# Secrets — never committed, and the agent is denied read access to these too
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*secret*
+*credential*
+
+# Ephemeral SDD working state: briefs, review packages, reports, unlock files
+.sdd/
+
+# Agent local state
+.claude/settings.local.json
+.claude/*.local.md
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Add language-specific ignores during the first /sdd-plan
