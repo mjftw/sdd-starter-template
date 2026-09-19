@@ -1,2 +1,2 @@
-# Slices
+# Current specifications, by bounded context
 
