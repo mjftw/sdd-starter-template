@@ -55,7 +55,7 @@ done
 rm -f .sdd/unlock-index
 
 # Remove the template's own upgrade plans if still present.
-rm -f docs/upgrade-plan.md docs/upgrade-plan-2.md docs/upgrade-plan-3.md
+rm -f docs/upgrade-plan*.md docs/upgrade-plan*.patch
 
 ./scripts/index.sh >/dev/null
 
