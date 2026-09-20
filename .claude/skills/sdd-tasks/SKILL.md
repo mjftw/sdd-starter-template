@@ -46,7 +46,12 @@ So each task carries everything it needs:
   scenario-driven: RED names the scenario ID (`REQ-00N/Sk`) and gives the
   actual test code, through the published interface (`bdd` skill) → run,
   expect *this* failure → GREEN → run, expect pass, suite green → REFACTOR.
-- **Verify** — the exact command and the exact expected output.
+- **Verify** — the exact command and the exact expected output. A task
+  that builds or alters a screen adds a second line: the
+  `design_snapshot.py … live` command and which wireframe state the
+  screenshot must match *in structure* (elements, order, states reachable).
+  Not taste: the screen is expected to be grey and correct here; taste is the
+  refinement loop after all tasks are done.
 
 **No placeholders.** Automatic failures: "add error handling", "handle edge
 cases", "similar to T011", `TBD`, `TODO`, a test described in prose, a value

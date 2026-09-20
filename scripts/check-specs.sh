@@ -49,6 +49,9 @@ else
 fi
 
 echo
+./scripts/check-design.sh | sed -n '1,20p'
+
+echo
 echo "AGENTS.md"
 if grep -q "FILL THIS IN" AGENTS.md 2>/dev/null; then
   warn "AGENTS.md Commands/Conventions/Architecture still unfilled"
@@ -152,6 +155,11 @@ for d in changes/[0-9][0-9][0-9]-*/; do
     if [[ "$status" != "draft" ]]; then
       ./scripts/merge_delta.py preview "$d" >/dev/null 2>/tmp/md.err || bad "delta does not merge: $(tail -1 /tmp/md.err)"
     fi
+  fi
+
+  if [[ -f docs/design.md && "$(./scripts/fm.py get docs/design.md sdd_interface 2>/dev/null)" == "yes" ]]; then
+    ./scripts/check-design.sh --change "$d" | sed -n '/^Interface/,$p' | grep -vE '^(✅|❌) design' | sed 's/^/  /'
+    ./scripts/check-design.sh --change "$d" >/dev/null 2>&1 || FAIL=1
   fi
 
   UNTOUCHED=false

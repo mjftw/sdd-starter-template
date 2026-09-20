@@ -79,6 +79,15 @@ approval `./scripts/approve.sh docs/product.md approved`, then
 `./scripts/index.sh`, and append each decision to `docs/decisions.md` as
 `<date> · init · <decision> · <why>`.
 
+## Step 3b — Interface → `docs/design.md` §1–§6
+
+Hand to `sdd-design` entry point **A**. One question decides whether the
+product has an interface at all; if it does, five more capture where it is
+used, its tone, density, conventions and accessibility floor, in the user's
+words. No colours, fonts or component libraries: those are asked at the
+first plan. If there is no interface, `docs/design.md` records that and
+every later change skips design automatically.
+
 ## Step 4 — Domain discovery → `docs/domain.md`
 
 Read the `ddd` skill. Then, from the product brief, propose a first cut of
@@ -147,14 +156,15 @@ Write the file. **Gate**: *Approve* / *Revise*, then
 
 ## Step 8 — Hand off
 
-Commit: `docs(init): intent, product brief, domain, roadmap, glossary`.
+Commit: `docs(init): intent, product brief, design principles, domain, roadmap, glossary`.
 
 Summarise in five lines: the product in one sentence; N contexts; N changes and
 which is first; the riskiest assumption; the open questions. Then offer to
 start change 1 with `grill`.
 
-Say explicitly: *engineering preferences and the stack are chosen at the first
-plan, from what we recorded today.* If `docs/engineering.md` was copied in by
+Say explicitly: *engineering preferences, the stack, and the design system
+(tokens, components) are chosen at the first plan, from what we recorded
+today.* If `docs/engineering.md` was copied in by
 `init.sh` from a master, say that too, in one line.
 
 ## Rules

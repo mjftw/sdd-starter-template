@@ -18,7 +18,7 @@ fi
 cp templates/README-project.md README.md
 
 # Seed the project-level docs from templates.
-for t in product domain roadmap glossary; do
+for t in product domain roadmap glossary design; do
   sed -e "s|conversation:YYYY-MM-DD|conversation:${TODAY}|" \
       -e "s|at: YYYY-MM-DDTHH:MM:SSZ|at: ${NOW}|" \
       "templates/${t}-template.md" > "docs/${t}.md"
@@ -32,6 +32,18 @@ if [[ -f "$MASTER" ]]; then
   echo "engineering preferences: copied from $MASTER"
 else
   echo "engineering preferences: none yet; the first plan will ask"
+fi
+
+# Design taste: cross-project, like engineering preferences but only the
+# taste section; everything else in docs/design.md is this product's.
+TASTE="${SDD_DESIGN_TASTE:-$HOME/.config/sdd/design-taste.md}"
+if [[ -f "$TASTE" ]]; then
+  python3 - "$TASTE" <<'PY'
+import sys, pathlib
+t = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").strip()
+d = pathlib.Path("docs/design.md"); d.write_text(d.read_text(encoding="utf-8").replace("<taste>", t), encoding="utf-8")
+PY
+  echo "design taste: copied from $TASTE"
 fi
 
 # Fill the name and description where they appear.

@@ -27,6 +27,12 @@ changes only when a delta is merged at `sdd-finish`.
    ADDED requirements continue from there. If the capability does not exist
    yet, the delta is all ADDED from `REQ-001` and the merge will create it.
 6. Copy `sdd_context` from `intent.md` to `proposal.md` (`fm.py set`).
+7. **Run `sdd-design` entry point B.** It decides whether this change has
+   screens, imports or wireframes them, walks the scenarios across them, and
+   fills the proposal's `## Interface` table. Its walkthrough list (scenarios
+   with no screen; screen elements with no requirement) is input to the
+   deltas you are about to write. If `docs/design.md` says the product has no
+   interface, this is one line and `none`.
 
 ## The change directory
 
@@ -48,6 +54,11 @@ Fill `proposal.md` in this order:
    counts and why. This is the map to the delta files.
 7. **Affects** — any change to `docs/domain.md`, `docs/glossary.md` or
    `docs/product.md` this requires. "none" is a valid and common answer.
+7b. **Interface** — already filled by `sdd-design`; now fill every row's
+   *Requirements seen here* with the qualified IDs from the delta. A row with
+   no requirement is a screen state nobody asked for: remove it or add the
+   requirement. A requirement with a visible effect that appears in no row
+   has no screen: add the state.
 8. **Non-functional requirements**, **Edge cases**, **Assumptions**,
    **Open questions** — as before.
 
@@ -92,6 +103,8 @@ Report in at most six lines:
 - The open questions, numbered
 - The riskiest assumption
 - The preview merged cleanly (say so)
+- `./scripts/check-design.sh --change changes/NNN-slug` clean (or "no
+  interface")
 
 Then `AskUserQuestion`: *Approve*, *Revise*, *Answer open questions first*.
 

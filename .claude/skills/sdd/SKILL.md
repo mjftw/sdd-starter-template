@@ -20,6 +20,11 @@ Classify the request:
 - **Small** — a change whose delta is one MODIFIED requirement or a couple of
   ADDED scenarios, no new interface, no new dependency, no schema change.
   Propose: proposal + delta only, skip the plan. Wait for confirmation.
+- **Design** — shipped screens that work but feel wrong; no behaviour change
+  intended. `./scripts/new-change.sh <slug> --design`: intent, then the
+  refinement loop straight on the live app (`sdd-design` D), no plan or
+  tasks. If a round changes behaviour, the loop writes the delta and the
+  change is no longer small: say so.
 - **Full** — anything else. Full workflow.
 - **Full, no exceptions** — touches auth, payments, personal data, deletion, or
   migrations. Full workflow even if the diff looks tiny. Say why.
@@ -36,6 +41,10 @@ Do this before asking the user anything:
 2. `docs/decisions.md` — read it. Nothing in it is asked again, in any phase.
 3. `memory/constitution.md` — `sdd_phase` not `ratified`, or contains
    `PLACEHOLDER`? Then `sdd-constitution` first.
+4b. `docs/design.md` — `sdd_interface` is `no`: design never applies.
+   `yes`: every change with screens goes through `sdd-design`. Missing or
+   `unknown`: the project predates design or has not answered; the first
+   change that adds a screen runs `sdd-design` A.
 4. `docs/engineering.md` — missing or `sdd_phase` not `approved`? Note it.
    It is needed at `sdd-plan`, not earlier; `sdd-plan` runs
    `sdd-engineering` itself. Never route to it before a spec is approved.
@@ -60,13 +69,16 @@ Running `./scripts/check-specs.sh` answers most of 3–8 in one call.
 | User asks what the system does / how X works now | Read `specs/<context>/<capability>.md` and answer from it. No change needed. |
 | Request does not match a change in `docs/roadmap.md` | Ask whether to add it, and where. Then `grill`. |
 | Change exists, no `intent.md` or `intent.md` not `resolved` | `grill` |
-| `intent.md` resolved, `proposal.md` still template or no deltas | `sdd-specify` |
+| `intent.md` resolved, `design/rounds.md` Origin says external tool and `design/` has no files | Ask the user to bring the design back (`sdd-design` B, import) — **stop** |
+| `intent.md` resolved, `proposal.md` still template or no deltas | `sdd-specify` (runs `sdd-design` B first) |
+| Proposal has `sdd_kind: design` (a `--design` change) and `intent.md` resolved | `sdd-design` D directly on the live app; then `sdd-converge` |
 | `proposal.md` written, `sdd_phase` not `approved` | Present it for approval — **stop** |
 | `proposal.md` approved, `plan.md` still template | `sdd-plan` (runs `sdd-engineering` first if `docs/engineering.md` is missing or unapproved) |
 | `plan.md` written, `sdd_phase` not `approved` | Present it for approval — **stop** |
 | `plan.md` approved, `tasks.md` still template | `sdd-tasks` |
 | `tasks.md` approved, tasks with `**Status:** todo` remain | `sdd-implement` |
-| All tasks `done` | `sdd-converge` |
+| All tasks `done`, Interface not `none`, `design/rounds.md` not `exited` | `sdd-design` D — the refinement loop |
+| All tasks `done` (and loop exited if there were screens) | `sdd-converge` |
 | Converge found gaps (appended tasks) | `sdd-implement` again |
 | Converge reports Converged | `sdd-finish` (merges the deltas into `specs/`) |
 
@@ -95,7 +107,7 @@ power follows.
 
 | Phase | Runs as | Model |
 |---|---|---|
-| `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan` | main session | strongest available |
+| `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan`, `sdd-design` | main session | strongest available |
 | `sdd-tasks` | main session | strongest or mid |
 | `sdd-implement` (controller) | main session | mid or strongest |
 | `implementer` (per task) | subagent | mid (sonnet); `Trivial` → small |

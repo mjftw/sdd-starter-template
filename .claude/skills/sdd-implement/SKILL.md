@@ -114,5 +114,13 @@ requirement turns out to be wrong, or a risk from the plan has materialised.
 ## When every task is done
 
 `./scripts/fm.py set changes/<change>/tasks.md sdd_phase complete`. Do not declare
-victory. Hand to `sdd-converge` — the change-level audit is by a reviewer that
+victory.
+
+If the change's proposal `## Interface` is not `none`, hand to `sdd-design`
+entry point **D** first: the screens are correct and grey, and the refinement
+loop on the live build is where they become right. It has no gates and ends
+when the user says so; its exit writes the reference screenshots the reviewer
+compares against.
+
+Then hand to `sdd-converge` — the change-level audit is by a reviewer that
 saw none of this.
