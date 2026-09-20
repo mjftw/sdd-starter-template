@@ -244,6 +244,54 @@ that removed it. IDs are never reused. A capability's history table lists every
 change that shaped it. The first change is not special: it is a delta that is
 all ADDED into a capability that does not exist yet, and the merge creates it.
 
+## Design
+
+Correct code with an unstyled interface is the normal result of a process
+that never asked what the thing should look like. This template asks, but at
+the moments a designer would, not all at once up front.
+
+At init, after the product brief, one question: does this product have an
+interface people look at? If not, docs/design.md records that and design
+never comes up again. If so, five short questions capture where it is used
+(device, distance, hands, attention), its tone, its density, the interaction
+rules that follow, and the accessibility floor. No colours, fonts or
+component libraries: those are technology and wait for the first plan.
+
+Before each change's proposal is written, sdd-design asks whether the change
+touches a screen. If it does: do you already have a design? Import it (Figma,
+exported screens, a Claude Design artifact, a photo of a sketch). Or go and
+make one elsewhere, and the change waits for you to bring it back. Or let the
+agent wireframe it: grey boxes, one file per screen, one block per state,
+screenshotted so the agent can see its own work. Then the walkthrough: every
+scenario is stepped across the screens, and every scenario with no screen, or
+screen element with no requirement, is settled before the requirements are
+written. That walkthrough is where the requirements the interview forgot
+turn up.
+
+The first plan that touches a screen chooses the UI stack and, with it, the
+system half of docs/design.md: a small set of tokens and how styles are
+written. check-design.sh warns from then on about hard-coded values outside
+the tokens file, the way check-contexts.sh warns about imports across
+contexts.
+
+The build is fast and grey. Design happens after it, in the refinement loop:
+the real app running, the user looking at it on the real device, saying what
+is wrong in their own words; the agent trying up to three treatments behind a
+temporary variant switch, screenshotting all of them, the user choosing.
+There is no gate per round. The record is design/rounds.md, one block per
+round with what was tried and why the winner won, so a decision made on the
+fifth try is never undone on the sixth. If a round changes behaviour rather
+than appearance, that is a requirement change and it goes into the delta, out
+loud. When the user says the screens are done, the loop exits: reference
+screenshots are taken, winning values and patterns are promoted into
+docs/design.md, and the reviewer's fidelity pass compares the shipped screens
+to those references and checks that screens the change did not list are
+untouched.
+
+Shipped screens that feel wrong later get a lighter path: new-change.sh with
+--design seeds an intent and goes straight to the loop on the live app, with
+no plan or tasks unless a round changes what the product does.
+
 ## Why it is shaped this way
 
 The rigour level here is spec-anchored: specs persist as a governing

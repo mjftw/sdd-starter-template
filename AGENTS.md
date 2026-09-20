@@ -33,12 +33,19 @@ If 4 conflicts with 1–3, stop and say so. Do not pick silently.
 - `docs/domain.md` — the bounded contexts, their code roots, the events between
   them, the invariants. A slice belongs to one. Code never crosses a context
   except through `published/`.
+- `docs/design.md` — whether there is an interface; where it is used and
+  how it should feel (§1–§6); the tokens and patterns every screen uses
+  (§7–§9); the living index of screens with their reference screenshots in
+  `docs/design/screens/`. Build screens from it; never restyle one a change
+  did not list.
 - `docs/decisions.md` — every decision the user has made. Never re-ask one.
 - `specs/<context>/<capability>.md` — **what the system does now.** One living
   spec per capability. Read it before touching that capability. Never edit it;
   it is merged from deltas at `sdd-finish`.
 - `changes/NNN-slug/` — a change in flight: `intent.md`, `proposal.md`,
-  `delta/`, `plan.md`, `tasks.md`, `notes.md`. `changes/archive/` — shipped.
+  `delta/`, `design/` (wireframes or imported references, `rounds.md`, and
+  at the loop's exit `reference/`), `plan.md`, `tasks.md`, `notes.md`.
+  `changes/archive/` — shipped.
 - `REVIEW.md` — the review policy. `docs/adr/` — decision records.
 - `index.md` in any directory — read it first; it lists what is there by type
   and phase. `log.md` — what was approved when.
@@ -93,8 +100,8 @@ Run `check` before calling any task done, and paste the output.
 ## Never
 
 - Read, print, or write `.env*`, `*.pem`, `*.key`, `*secret*`, `*credential*`.
-- Edit `memory/constitution.md`, `docs/engineering.md` or `REVIEW.md` outside
-  their skills; propose instead.
+- Edit `memory/constitution.md`, `docs/engineering.md`, `docs/design.md` or
+  `REVIEW.md` outside their skills; propose instead.
 - Hand-edit YAML frontmatter, `index.md` or `log.md`. Use `scripts/fm.py`,
   `scripts/approve.sh`, `scripts/index.sh`.
 - Import another context's internals; only its `published/` interface or its
@@ -107,5 +114,8 @@ Run `check` before calling any task done, and paste the output.
   change.
 - Invent a requirement, a command, or a convention. Ask.
 - Add a feature, abstraction, or dependency the spec and plan do not name.
+- Copy wireframe HTML into the app, or style with a value that is not a
+  token in `docs/design.md` §8 once it is approved. Build the real screen
+  against the wireframe; promote the value or note why not.
 - Claim a test passes without having run it.
 - Mark a task done with a failing test, a stub, or a `TODO` in a covered path.

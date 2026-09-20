@@ -225,7 +225,11 @@ nowhere else.
 |---|---|---|
 | What you are trying to achieve, openly | `/sdd-init` step 2, once | recorded in `docs/intent-product.md` |
 | The big questions: what, for whom, contexts, invariants | `/sdd-init`, once | recorded in `docs/` and `docs/decisions.md` |
+| Whether there is an interface, and where and how it is used | `/sdd-init` step 3b, once | recorded in `docs/design.md` |
 | How you like code written | the first `sdd-plan`, once ever | recorded in `docs/engineering.md` and your master copy |
+| Do you have a design, or wireframe it? Then what is missing on each screen | before each change's proposal, if it touches a screen | wireframes and the walkthrough in the change's `design/` |
+| Tokens: the palette, type and spacing | the first `sdd-plan` that touches a screen | recorded in `docs/design.md` §8 |
+| What is wrong with the screen, and which treatment wins | the refinement loop, as many rounds as you like, no approvals | `design/rounds.md`; winners promoted to `docs/design.md` at exit |
 | Everything about a change | `grill`, once per change | recorded in `intent.md` |
 | Approve or revise | each gate: spec, plan, tasks, and the init docs | approval is a `verified` stamp on the file |
 | A question the brief could not answer | mid-implementation, rarely | answered once, added to `decisions.md` |
@@ -318,6 +322,45 @@ The first change is not special: it is a delta that is all ADDED into a
 capability that does not exist yet, and the merge creates it. There is no
 initial-build mode and no migration to an evolution mode.
 
+## Designing the interface
+
+Most of the artefacts here are words, and a process made of words produces
+software that works and looks like nothing. So design has its own place in
+the ladder, at the moments a designer would be in the room.
+
+At init the agent asks one question: does this product have an interface
+people look at? A library or a service says no, and design never comes up
+again. Anything else says yes, and a few short questions record where it is
+used (a phone on a music stand, a laptop at a desk, an e-ink panel on a wall),
+the tone, what must always be visible, the interaction rules that follow, and
+the accessibility floor. Nothing about colour or fonts yet; those are chosen
+with the stack.
+
+Before each change is specified, the agent asks whether it touches a screen.
+If it does, you have three ways in. Import a design you already have, from
+Figma, from Claude Design, from a photo of a sketch. Go and make one in one of
+those tools, and the change waits until you bring it back. Or have the agent
+wireframe it: grey boxes, one file per screen, one block per state, which it
+screenshots and looks at before showing you. Either way the agent then walks
+every scenario across the screens and tells you which scenarios have nowhere
+to happen and which screen elements no requirement asks for. That list is
+settled before the requirements are written.
+
+Then the build, which is meant to be correct and grey. The design itself
+happens afterwards in the refinement loop, on the real app, on the real
+device. You say what is wrong. The agent tries up to three treatments at
+once behind a temporary switch, screenshots them, and you pick. No approval
+per round; the record is a log of what was tried and why the winner won. If a
+round changes what the product does rather than how it looks, the agent
+writes that into the delta and says so. When you say it is done, the loop
+exits: reference screenshots are taken, the values that won become tokens in
+docs/design.md, and the reviewer compares the shipped screens to those
+references, including checking that screens the change did not list have not
+changed.
+
+For shipped screens that work but feel wrong, new-change.sh --design skips
+the plan and tasks and goes straight to the loop.
+
 ## What the agent is not allowed to do
 
 Each of these is enforced by a mechanism, not by asking nicely.
@@ -384,7 +427,7 @@ All stdlib bash and Python 3, no dependencies.
 | Script | Does |
 |---|---|
 | `init.sh "Name" "One line"` | one-time instantiation of a repo made from this template |
-| `new-change.sh <slug> [--branch]` | allocates the next change number (archived ones count), seeds the change from templates |
+| `new-change.sh <slug> [--branch] [--design]` | allocates the next change number (archived ones count), seeds the change from templates; `--design` seeds only intent, proposal and the design log for a refinement-only change |
 | `merge_delta.py preview\|apply <change>` | previews a change's deltas against the living specs into `.sdd/target/`, or merges them in at finish |
 | `fm.py get\|set\|check\|verify` | the only way frontmatter is read or written |
 | `approve.sh <file> <phase>` | the only way a gate is passed; stamps `verified`, appends to `log.md` |
@@ -392,6 +435,8 @@ All stdlib bash and Python 3, no dependencies.
 | `check-specs.sh` | lints the artefact tree: phases, contexts, scenarios, placeholders, tech in specs |
 | `check-contexts.sh` | fails a cross-context import that bypasses `published/` |
 | `check-scenarios.sh` | every live scenario has a test and no test cites a removed requirement; `--change` checks a change's target state |
+| `check-design.sh` | docs/design.md state and hard-coded values outside the tokens file; `--change` checks a change's Interface table: design files and states exist, cited requirements are in the target state, every row has a reference once the loop has exited |
+| `design_snapshot.py <change> wireframes\|live\|reference` | screenshots every screen and state in the Interface table: the wireframes, the running app (with `--variants a,b,c` for a round of the loop), or the references at its exit |
 | `task-brief.sh <change> <TID>` | extracts one task into a self-contained brief for the implementer |
 | `review-package.sh <change> <TID> <base>` | packages a task's diff for the reviewer |
 | `hooks/guard-paths.sh` | `PreToolUse`: protected paths |

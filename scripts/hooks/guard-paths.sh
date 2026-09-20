@@ -50,6 +50,10 @@ case "$REL" in
     if [[ -f .sdd/unlock-engineering ]]; then exit 0; fi
     echo "blocked: docs/engineering.md is edited only by /sdd-engineering after the user approves." >&2
     exit 2 ;;
+  docs/design.md)
+    if [[ -f .sdd/unlock-design ]]; then exit 0; fi
+    echo "blocked: docs/design.md is edited only by /sdd-design (init principles, plan system, loop exit) after the user approves." >&2
+    exit 2 ;;
   REVIEW.md)
     echo "blocked: REVIEW.md is the user's review policy. Propose the change; do not make it." >&2
     exit 2 ;;

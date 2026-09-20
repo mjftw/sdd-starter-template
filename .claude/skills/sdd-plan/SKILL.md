@@ -39,6 +39,13 @@ reason**.
    preference does not fit this problem), name the section and the reason under
    `## Open questions` — the user decides, not the plan.
 
+8. If the change's `## Interface` is not `none`: read `docs/design.md`. If
+   §7 is still the template, this plan also fills the system half — run
+   `sdd-design` entry point **C** after the stack is chosen (below), before
+   the gate. Either way the plan's Structure names the tokens file and the
+   Interfaces section lists each screen's route, and you fill the `Route`
+   column of the proposal's Interface table.
+
 ## Choosing the stack
 
 This is the first artefact in the project that names a technology, and the
@@ -133,6 +140,10 @@ On approval:
 - fill `scripts/hooks/post-edit.sh` with the project formatter
 - tune `scripts/check-contexts.sh` (`PUBLISHED`, `IMPORT_RE`) to the chosen
   stack if the defaults do not fit it
+- if the change has screens: `scripts/check-design.sh` (`STYLE_GLOB`,
+  `TOKENS_FILE`) likewise; `docs/design.md` §7–§8 approved via
+  `sdd-design` C (same approval as this plan); the Interface table's
+  `Route` column filled
 - if this change introduces a context, event or invariant not yet in
   `docs/domain.md`, propose the map change and, once the user agrees,
   `./scripts/approve.sh docs/domain.md approved`
