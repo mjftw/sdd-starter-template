@@ -2,6 +2,7 @@
 type: Skill
 name: sdd-specify
 description: Write a change proposal and its delta specs — the WHAT and WHY of a change, and exactly which requirements it adds, modifies or removes in which living capability specs — into changes/NNN-slug/. Use after a grilling session, or when the user says "write the spec", "spec this", "propose this", "turn this into a spec". Writes no implementation code and never edits specs/ directly.
+model: fable
 ---
 
 # Specify — propose a change
@@ -10,6 +11,19 @@ Produce `changes/NNN-slug/proposal.md` and one delta file per capability the
 change touches, under `changes/NNN-slug/delta/<context>/<capability>.md`.
 **No technology.** **Never edit `specs/`** — that is the current truth, and it
 changes only when a delta is merged at `sdd-finish`.
+
+
+## Model
+
+Top of the ladder: this skill runs on Fable (`model: fable` above). First
+thing, before any question: `./scripts/phase.sh show`. If it prints nothing,
+run `./scripts/phase.sh enter sdd-specify`; if it names a phase, leave it alone
+(you were called from inside that phase). While the marker is set, every
+turn starts with the `sdd-continue` skill, which keeps the interview on Fable
+while the session default stays cheap. Writes to the artefacts this skill
+owns are refused on any other model (`scripts/hooks/guard-paths.sh`); if a
+write is refused, invoke `sdd-continue` and retry. If Fable is not available
+to this account, stop and tell the user; do not carry on in a weaker model.
 
 ## Before writing
 

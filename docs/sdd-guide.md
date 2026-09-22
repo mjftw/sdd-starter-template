@@ -138,17 +138,36 @@ power follows.
 
 | Phase | Runs as | Model |
 |---|---|---|
-| `sdd-init`, `sdd-constitution`, `grill`, `sdd-specify`, `sdd-plan` (and `sdd-engineering`, which it runs) | main session | strongest available |
-| `sdd-tasks` | main session | strongest or mid |
-| `sdd-implement` (controller) | main session | mid or strongest |
-| `implementer` (per task) | subagent | mid (sonnet); `Trivial` → small |
-| `task-reviewer` (per task) | subagent | mid (sonnet) |
-| `sdd-converge` → `reviewer` | subagent | strongest |
-| `sdd-finish` | main session | any |
+| `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan`, `sdd-design` | main session | Fable |
+| `sdd-tasks`, `sdd-implement` (controller), `sdd-finish` | main session | Sonnet, the project default |
+| `implementer`, `task-reviewer` (per task) | subagents | Sonnet (Haiku for a trivial task) |
+| `sdd-converge` → `reviewer` | subagent | Opus |
 
-The one place the ladder bends is the reviewer: verification weaker than what
-it verifies catches nothing, so `converge` runs on the strongest model.
-Overrule it in `.claude/agents/reviewer.md` if you disagree.
+The ladder is enforced, not requested. The session starts on Sonnet
+(`.claude/settings.json`), so nothing runs on Fable unless a phase needs it.
+Each Fable skill carries `model: fable`, but a skill's model only lasts for
+the turn it is invoked in, and an interview is many turns. So the skill also
+opens a phase marker (`.sdd/phase`); while it is open, a hook reminds the
+agent at the start of every turn to invoke `sdd-continue`, a tiny skill whose
+only job is to move that turn to Fable. The marker closes at the gate that
+hands down to a lower phase, and anything left open for twelve hours is
+dropped.
+
+Behind that sits a guard. The write hook reads from the session transcript
+which model issued each write, and refuses writes to the intent, proposal,
+deltas, plan, design files, and the product, domain, roadmap, glossary,
+engineering and constitution documents from any model not in
+`SDD_STRONG_MODELS` (`claude-fable-*` by default, in `.claude/settings.json`).
+If you start a session on Haiku and ask it to spec something, it can talk to
+you, but it cannot write the spec. If Fable is not available to your account
+the agent stops and tells you; creating `.sdd/unlock-model` is how you say
+"write it on this model anyway", and agents are told never to create it.
+
+Verification is never weaker than what it verifies, so the change-level
+reviewer is Opus whatever the session is on. Subagent tiers live in
+`.claude/agents/*.md`. To move the top of the ladder to a newer model, change
+`SDD_STRONG_MODELS` and the `model:` line in the eight skills that carry it;
+`./scripts/selftest-models.sh` checks the guard afterwards.
 
 ## The implementation loop
 

@@ -2,6 +2,7 @@
 type: Skill
 name: sdd-constitution
 description: Establish or amend the project constitution in memory/constitution.md — the non-negotiable principles that outrank every spec, plan and instruction. Use once per project before the first spec, when the constitution is still marked DRAFT or contains placeholders, or when the user asks to change a project principle, add a standard, or amend the constitution.
+model: fable
 ---
 
 # Constitution
@@ -10,6 +11,19 @@ description: Establish or amend the project constitution in memory/constitution.
 I–IV and VIII–X are fixed by the workflow itself. Articles V–VII are
 deliberately left to the project — Spec Kit's structure keeps nine articles
 stable while each project encodes its own non-negotiable standards.
+
+
+## Model
+
+Top of the ladder: this skill runs on Fable (`model: fable` above). First
+thing, before any question: `./scripts/phase.sh show`. If it prints nothing,
+run `./scripts/phase.sh enter sdd-constitution`; if it names a phase, leave it alone
+(you were called from inside that phase). While the marker is set, every
+turn starts with the `sdd-continue` skill, which keeps the interview on Fable
+while the session default stays cheap. Writes to the artefacts this skill
+owns are refused on any other model (`scripts/hooks/guard-paths.sh`); if a
+write is refused, invoke `sdd-continue` and retry. If Fable is not available
+to this account, stop and tell the user; do not carry on in a weaker model.
 
 ## If establishing it for the first time
 
@@ -82,3 +96,7 @@ stable while each project encodes its own non-negotiable standards.
   between the user's approval and the commit.
 - Every article must be checkable. If no one can tell whether it was violated,
   it is a value statement, not an article — put it in the README.
+
+When the constitution is ratified or the amendment applied: if you entered
+the phase yourself (it was not open when you started), `./scripts/phase.sh
+leave`. If `sdd-init` called you, leave the marker; init closes it.

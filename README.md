@@ -290,15 +290,36 @@ Judgement at the top, hands at the bottom, model power following:
 
 | Phase | Runs as | Model |
 |---|---|---|
-| `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan` | main session | strongest available |
-| `sdd-tasks`, `sdd-implement` (controller) | main session | strongest or mid |
-| `implementer`, `task-reviewer` (per task) | subagents | mid (Sonnet) |
-| `sdd-converge` → `reviewer` | subagent | strongest |
-| `sdd-finish` | main session | any |
+| `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan`, `sdd-design` | main session | Fable |
+| `sdd-tasks`, `sdd-implement` (controller), `sdd-finish` | main session | Sonnet, the project default |
+| `implementer`, `task-reviewer` (per task) | subagents | Sonnet (Haiku for a trivial task) |
+| `sdd-converge` → `reviewer` | subagent | Opus |
 
-There is one deliberate bend in the ladder. Verification is never weaker than
-what it verifies, so the change-level reviewer is pinned to the strongest model.
-Tiers are set in `.claude/agents/*.md` and are yours to change.
+The ladder is enforced, not requested. The session starts on Sonnet
+(`.claude/settings.json`), so nothing runs on Fable unless a phase needs it.
+Each Fable skill carries `model: fable`, but a skill's model only lasts for
+the turn it is invoked in, and an interview is many turns. So the skill also
+opens a phase marker (`.sdd/phase`); while it is open, a hook reminds the
+agent at the start of every turn to invoke `sdd-continue`, a tiny skill whose
+only job is to move that turn to Fable. The marker closes at the gate that
+hands down to a lower phase, and anything left open for twelve hours is
+dropped.
+
+Behind that sits a guard. The write hook reads from the session transcript
+which model issued each write, and refuses writes to the intent, proposal,
+deltas, plan, design files, and the product, domain, roadmap, glossary,
+engineering and constitution documents from any model not in
+`SDD_STRONG_MODELS` (`claude-fable-*` by default, in `.claude/settings.json`).
+If you start a session on Haiku and ask it to spec something, it can talk to
+you, but it cannot write the spec. If Fable is not available to your account
+the agent stops and tells you; creating `.sdd/unlock-model` is how you say
+"write it on this model anyway", and agents are told never to create it.
+
+Verification is never weaker than what it verifies, so the change-level
+reviewer is Opus whatever the session is on. Subagent tiers live in
+`.claude/agents/*.md`. To move the top of the ladder to a newer model, change
+`SDD_STRONG_MODELS` and the `model:` line in the eight skills that carry it;
+`./scripts/selftest-models.sh` checks the guard afterwards.
 
 ## How the product evolves
 
@@ -436,6 +457,8 @@ All stdlib bash and Python 3, no dependencies.
 | `check-contexts.sh` | fails a cross-context import that bypasses `published/` |
 | `check-scenarios.sh` | every live scenario has a test and no test cites a removed requirement; `--change` checks a change's target state |
 | `check-design.sh` | docs/design.md state and hard-coded values outside the tokens file; `--change` checks a change's Interface table: design files and states exist, cited requirements are in the target state, every row has a reference once the loop has exited |
+| `phase.sh enter <skill>\|leave\|show` | opens and closes the top-of-ladder phase marker that keeps an interview on Fable; skills call it, you rarely need to |
+| `selftest-models.sh` | checks the model ladder's enforcement on this install: the write guard, the phase marker, the skill and agent model lines |
 | `design_snapshot.py <change> wireframes\|live\|reference` | screenshots every screen and state in the Interface table: the wireframes, the running app (with `--variants a,b,c` for a round of the loop), or the references at its exit |
 | `task-brief.sh <change> <TID>` | extracts one task into a self-contained brief for the implementer |
 | `review-package.sh <change> <TID> <base>` | packages a task's diff for the reviewer |

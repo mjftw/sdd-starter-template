@@ -12,6 +12,12 @@ changes pass tests, look reasonable, and still drift from the rules they were
 meant to follow — and a spec only helps if something actually checks the code
 against it.
 
+## Model
+
+Below the top of the ladder: this runs on the session default (Sonnet). First
+thing: `./scripts/phase.sh leave` (a no-op if no phase is open), so later turns
+are not moved up to Fable for nothing.
+
 ## How this phase runs
 
 This phase **always** runs as the `reviewer` subagent

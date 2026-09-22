@@ -2,6 +2,7 @@
 type: Skill
 name: sdd-design
 description: Interface design for a product built with agents — the principles interview at init, the "do we have a design?" decision tree and wireframes before a proposal is written, the design-system half of docs/design.md at the first plan, and the gate-free refinement loop on the live build with its exit procedure. Use when a change adds or alters a screen, when the user says "design", "mockup", "wireframe", "what should it look like", "it looks awful", "make it feel right", or when docs/design.md is missing or unresolved. Skipped entirely when docs/design.md says the product has no interface.
+model: fable
 ---
 
 # Design
@@ -26,6 +27,19 @@ Two rules that hold everywhere:
 follows it.
 
 ---
+
+
+## Model
+
+Top of the ladder: this skill runs on Fable (`model: fable` above). First
+thing, before any question: `./scripts/phase.sh show`. If it prints nothing,
+run `./scripts/phase.sh enter sdd-design`; if it names a phase, leave it alone
+(you were called from inside that phase). While the marker is set, every
+turn starts with the `sdd-continue` skill, which keeps the interview on Fable
+while the session default stays cheap. Writes to the artefacts this skill
+owns are refused on any other model (`scripts/hooks/guard-paths.sh`); if a
+write is refused, invoke `sdd-continue` and retry. If Fable is not available
+to this account, stop and tell the user; do not carry on in a weaker model.
 
 ## A. Principles — at `sdd-init`, after the product brief
 
@@ -228,16 +242,15 @@ walkthrough problem, not a taste problem.
 4. Write `rounds.md › Exit`; `fm.py set changes/<id>/design/rounds.md
    sdd_phase exited`; `./scripts/check-design.sh --change changes/<id>`
    must be clean (every row has its reference).
-5. Commit `design(<id>): exit — <N> rounds, <M> tokens promoted`. Hand to
-   `sdd-converge`, whose fidelity pass compares the shipped screens to these
+5. Commit `design(<id>): exit — <N> rounds, <M> tokens promoted`.
+   `./scripts/phase.sh leave`, then hand to `sdd-converge`, whose fidelity pass compares the shipped screens to these
    references.
 
 ---
 
 ## Model
 
-Entry points A–D run in the main session on the **strongest model
-available**: A and B are judgement about the product; C is taste with
+Entry points A–D run in the main session on Fable (see Model above): A and B are judgement about the product; C is taste with
 constraints; D reads screenshots and proposes treatments, and a weak model
 here produces the "technically correct and awful" result this skill exists
 to prevent. The implementer subagent still builds the screens from the

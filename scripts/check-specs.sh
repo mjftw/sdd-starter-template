@@ -52,6 +52,13 @@ echo
 ./scripts/check-design.sh | sed -n '1,20p'
 
 echo
+echo "Model ladder"
+echo "  session default: $(python3 -c "import json;print(json.load(open('.claude/settings.json')).get('model','(unset)'))" 2>/dev/null) · strong: ${SDD_STRONG_MODELS:-$(python3 -c "import json;print(json.load(open('.claude/settings.json')).get('env',{}).get('SDD_STRONG_MODELS','claude-fable-*'))" 2>/dev/null)}"
+PH=$(./scripts/phase.sh show 2>/dev/null || true)
+[[ -n "$PH" ]] && echo "  phase open: $PH (every turn moves to the strong model until ./scripts/phase.sh leave)" || echo "  no phase open"
+[[ -f .sdd/unlock-model ]] && warn ".sdd/unlock-model exists: top-of-ladder artefacts can be written on any model. Remove it when done."
+
+echo
 echo "AGENTS.md"
 if grep -q "FILL THIS IN" AGENTS.md 2>/dev/null; then
   warn "AGENTS.md Commands/Conventions/Architecture still unfilled"

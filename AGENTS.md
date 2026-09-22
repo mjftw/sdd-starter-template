@@ -52,6 +52,8 @@ If 4 conflicts with 1–3, stop and say so. Do not pick silently.
 - `docs/okf.md` — the frontmatter every artefact carries and what it means.
 - `.claude/skills/` — the workflow. `.claude/agents/` — implementer,
   task-reviewer, reviewer.
+- `.sdd/phase` — the open top-of-ladder phase, if any. While it is set, start
+  every turn by invoking the `sdd-continue` skill (the hook will remind you).
 
 ## Commands
 
@@ -117,5 +119,9 @@ Run `check` before calling any task done, and paste the output.
 - Copy wireframe HTML into the app, or style with a value that is not a
   token in `docs/design.md` §8 once it is approved. Build the real screen
   against the wireframe; promote the value or note why not.
+- Create `.sdd/unlock-model`, or write a top-of-ladder artefact (intent,
+  proposal, delta, plan, design, product/domain/roadmap/glossary/engineering,
+  constitution) on a model other than `SDD_STRONG_MODELS`. The guard refuses
+  it; when it does, invoke `sdd-continue` and retry, or tell the user.
 - Claim a test passes without having run it.
 - Mark a task done with a failing test, a stub, or a `TODO` in a covered path.
