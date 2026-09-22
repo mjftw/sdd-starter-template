@@ -311,6 +311,19 @@ Shipped screens that feel wrong later get a lighter path: new-change.sh with
 --design seeds an intent and goes straight to the loop on the live app, with
 no plan or tasks unless a round changes what the product does.
 
+## What is kept
+
+Nothing that explains a decision is thrown away when the change ships. The
+change directory is archived whole. Each gate commits a numbered draft
+first, so revisions are in git history. record.sh copies every task
+attempt's implementer report and review, and every convergence report, out
+of the ephemeral .sdd/ directory into the change's record/ folder; the
+design loop keeps each round's screenshots, rejected ones included. The init,
+constitution, engineering and design interviews write docs/interviews/, one
+block per question with the recommendation and the user's answer, the shape
+grill already uses for an intent. Only task briefs and the merged preview are
+discarded, since both are regenerated from what is kept.
+
 ## Why it is shaped this way
 
 The rigour level here is spec-anchored: specs persist as a governing

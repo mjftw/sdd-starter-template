@@ -52,6 +52,7 @@ expect "a wireframe on Sonnet is refused"                  2 "$(guard changes/00
 expect "tasks.md on Sonnet is allowed (not top)"           0 "$(guard changes/001-x/tasks.md "$T/sonnet" tB)"
 expect "source code on Haiku is allowed"                   0 "$(guard src/a/b.py "$T/haiku" tC)"
 expect "docs/product.md on Sonnet is refused"              2 "$(guard docs/product.md "$T/sonnet" tB)"
+expect "an interview record on Sonnet is refused"          2 "$(guard docs/interviews/init.md "$T/sonnet" tB)"
 expect "docs/product.md on Opus is refused (Fable only)"   2 "$(guard docs/product.md "$T/opus" tO)"
 expect "a <synthetic> entry is skipped"                    0 "$(guard docs/domain.md "$T/synth" tD)"
 expect "the calling message wins over a later one"         2 "$(guard docs/roadmap.md "$T/later" tE)"

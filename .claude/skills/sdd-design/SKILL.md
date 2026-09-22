@@ -41,6 +41,17 @@ owns are refused on any other model (`scripts/hooks/guard-paths.sh`); if a
 write is refused, invoke `sdd-continue` and retry. If Fable is not available
 to this account, stop and tell the user; do not carry on in a weaker model.
 
+## The interview record
+
+Every question this skill asks is written to `docs/interviews/design.md`
+(from `templates/interview-template.md`; create it on the first question,
+`sdd_phase: open`) as it is asked and answered: the question, the
+recommendation you offered, the user's answer in their words, and where in
+the artefact it landed. Questions you decided not to ask go under `## Not
+asked` with the reason. When the gate passes, set `sdd_phase: closed` and
+commit the record with the artefact. The artefact is the summary; the
+record is why it says what it says.
+
 ## A. Principles — at `sdd-init`, after the product brief
 
 Called by `sdd-init` step 3b. Also called by entry point B when a change
@@ -213,8 +224,11 @@ judge, and the only record is `rounds.md`.
    yourself first: discard a variant that is plainly broken before the user
    sees it. Then give the user the paths and the URLs.
 4. The user chooses, or mixes, or rejects all. Record `Chose` and `Rejected
-   because` in their words. Remove the switch; keep the winner. Commit
-   `design(<id>): round N — <one line>`.
+   because` in their words. `./scripts/record.sh changes/<id> design-round N`
+   keeps this round's screenshots, the rejected ones included, under
+   `design/rounds/round-N/`; link them from the round's block so "rejected
+   because cramped" has the picture next to it. Remove the switch; keep the
+   winner. Commit `design(<id>): round N — <one line>`.
 5. **Requirement changed?** If the round altered behaviour rather than
    appearance ("the names toggle is a long-press now"), that is a
    requirement change: write it to the delta (ADDED or MODIFIED) now, note

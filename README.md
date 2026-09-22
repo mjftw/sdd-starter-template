@@ -382,6 +382,35 @@ changed.
 For shipped screens that work but feel wrong, new-change.sh --design skips
 the plan and tasks and goes straight to the loop.
 
+## What is kept
+
+Consolidating a change into the living specs would be a bad trade if it
+threw the reasoning away, so the process keeps more than the result.
+
+The change directory is never deleted. At finish it moves to
+changes/archive/ with its intent, proposal, deltas, plan, tasks, notes and
+design folder intact, and the living spec's sources and history table point
+back at it.
+
+Every gate commits a numbered draft before you see it. Send a proposal back
+three times and git log on that file shows all four versions; a requirement
+you had removed before approving is one diff away, not gone.
+
+The working files the agents write while building are copied into the
+change's record/ folder as they are produced: the implementer's report and
+the reviewer's findings for every task attempt, including the ones that
+failed and went round the fix loop, and every convergence report, one per
+cycle. The design loop keeps the screenshots of every round under
+design/rounds/, rejected treatments included, so the log's "rejected because
+cramped" sits next to the picture. Only the task briefs and the merged
+preview are discarded, because both are regenerated from what is kept.
+
+The init, constitution, engineering and design interviews write a record in
+docs/interviews/: every question, the recommendation the agent made, and
+your answer in your words, in the same shape a change's intent already uses.
+The recommendations you overrode are the useful lines; they are where the
+agent would have got it wrong on its own.
+
 ## What the agent is not allowed to do
 
 Each of these is enforced by a mechanism, not by asking nicely.
@@ -457,6 +486,8 @@ All stdlib bash and Python 3, no dependencies.
 | `check-contexts.sh` | fails a cross-context import that bypasses `published/` |
 | `check-scenarios.sh` | every live scenario has a test and no test cites a removed requirement; `--change` checks a change's target state |
 | `check-design.sh` | docs/design.md state and hard-coded values outside the tokens file; `--change` checks a change's Interface table: design files and states exist, cited requirements are in the target state, every row has a reference once the loop has exited |
+| `record.sh <change> task T0NN\|converge\|design-round N\|list` | copies the implementer report and task review, the convergence report, or a design round's screenshots from the ephemeral .sdd/ into the change's committed record, numbered per attempt |
+| `draft.sh <path> [path...]` | commits the artefact as a numbered draft before a gate, so rejected versions stay in git history |
 | `phase.sh enter <skill>\|leave\|show` | opens and closes the top-of-ladder phase marker that keeps an interview on Fable; skills call it, you rarely need to |
 | `selftest-models.sh` | checks the model ladder's enforcement on this install: the write guard, the phase marker, the skill and agent model lines |
 | `design_snapshot.py <change> wireframes\|live\|reference` | screenshots every screen and state in the Interface table: the wireframes, the running app (with `--variants a,b,c` for a round of the loop), or the references at its exit |

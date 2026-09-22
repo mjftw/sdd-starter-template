@@ -74,6 +74,7 @@ case "$REL" in
   changes/*/plan.md)                        OWNER=sdd-plan ;;
   changes/*/design/*.html|changes/*/design/rounds.md) OWNER=sdd-design ;;
   docs/intent-product.md|docs/product.md|docs/domain.md|docs/roadmap.md|docs/glossary.md) OWNER=sdd-init ;;
+  docs/interviews/*.md)                     OWNER=sdd-continue ;;
   docs/design.md)                           OWNER=sdd-design ;;
   docs/engineering.md)                      OWNER=sdd-engineering ;;
   memory/constitution.md)                   OWNER=sdd-constitution ;;

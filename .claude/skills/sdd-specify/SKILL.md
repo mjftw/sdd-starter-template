@@ -109,6 +109,13 @@ capability will say after the change. If it reads wrong, the delta is wrong.
 
 ## Gate
 
+First `./scripts/draft.sh changes/NNN-slug/proposal.md changes/NNN-slug/delta`
+— the version you are about to show is committed as a numbered draft. Every
+time the user sends it back and you revise, run it again before showing the
+next version. The versions the user rejected are then in `git log --
+changes/NNN-slug/proposal.md`, and a requirement they had you remove is one
+diff away instead of gone.
+
 Report in at most six lines:
 
 - The capabilities touched, with adds / modifies / removes per capability

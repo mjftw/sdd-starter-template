@@ -42,7 +42,9 @@ Your job in the main session:
    if no server can be started, say so in the report rather than skipping
    the pass silently.
 2. Receive the report. Do not edit it, soften it, or "fix a couple of things
-   first".
+   first". `./scripts/record.sh changes/<change> converge` — every cycle's
+   report is kept as `record/converge-N.md`; a later cycle never overwrites
+   an earlier one. Commit it.
 3. Act on the verdict (below).
 
 ## Checks

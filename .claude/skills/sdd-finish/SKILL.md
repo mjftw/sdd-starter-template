@@ -94,8 +94,14 @@ Per `docs/engineering.md` §13, recommend the one it names:
 ## 6. After
 
 - Worktree, if used: `git worktree remove ../<repo>-<id>`.
-- `.sdd/briefs/<id>`, `.sdd/reviews/<id>`, `.sdd/target/<id>`,
-  `.sdd/design/<id>`: delete.
+- `./scripts/record.sh changes/archive/<id> list` — the record travels with
+  the archived change: task reports and reviews per attempt, every
+  convergence report, every design round's screenshots. Check it is not
+  empty for a change that had tasks; if a task's record is missing, the
+  controller skipped step 9 — copy it now from `.sdd/` before the next line.
+- `.sdd/briefs/<id>`, `.sdd/reviews/<id>`, `.sdd/reports/<id>`,
+  `.sdd/target/<id>`, `.sdd/design/<id>`: delete. Everything worth keeping
+  from them is in the record.
 - Say in four lines: which capabilities changed and to what version, what
   shipped, the next change on the roadmap, any open item carried forward.
   Offer `grill` for the next change.

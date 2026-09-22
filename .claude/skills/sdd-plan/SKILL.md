@@ -134,7 +134,9 @@ cannot be turned off, that is itself the top risk.
 
 ## Gate
 
-Write the file, then report in at most five lines:
+Write the file, `./scripts/draft.sh changes/NNN-slug/plan.md` (a numbered
+draft commit; again after every revision), then report in at most five
+lines:
 
 - The approach in one sentence
 - The choices most likely to be wrong, and the alternative for each

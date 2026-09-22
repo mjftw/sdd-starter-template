@@ -110,6 +110,9 @@ Run these over the whole file and fix what fails before presenting:
 
 ## Gate
 
+`./scripts/draft.sh changes/NNN-slug/tasks.md` before showing it, and again
+after each revision.
+
 Write the file, then report in at most five lines:
 
 - Task count, and phase breakdown

@@ -173,6 +173,10 @@ and the user would not correct it.
 For any other project-level grilling (a big decision, a direction change),
 write `docs/intent-<topic>.md` the same way.
 
+At the end of every grilling session that does not resolve the tree,
+`./scripts/draft.sh changes/NNN-slug/intent.md` so the partial interview is in
+git and survives a lost session.
+
 When the tree is resolved:
 
 1. Fill `## Resolved`, `## Assumptions carried`, `## Still open`,
