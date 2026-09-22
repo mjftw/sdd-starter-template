@@ -9,6 +9,12 @@ description: Break an approved plan into an ordered, dependency-aware task list 
 Produce `changes/NNN-slug/tasks.md`: an ordered checklist an agent can execute one
 item at a time without re-deriving the design.
 
+## Model
+
+Below the top of the ladder: this runs on the session default (Sonnet). First
+thing: `./scripts/phase.sh leave` (a no-op if no phase is open), so later turns
+are not moved up to Fable for nothing.
+
 ## Before writing
 
 1. Read the approved `proposal.md`, its deltas, and `plan.md`. The proposal

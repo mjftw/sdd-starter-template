@@ -2,6 +2,7 @@
 type: Skill
 name: sdd-plan
 description: Turn an approved spec into a technical implementation plan in changes/NNN-slug/plan.md — stack, data model, interfaces, file structure, test strategy, risks and rollout. Use after a spec is approved, or when the user says "plan this", "write the plan", "how should we build it", or asks for architecture or technology choices for a specced feature.
+model: fable
 ---
 
 # Plan
@@ -9,6 +10,19 @@ description: Turn an approved spec into a technical implementation plan in chang
 Produce `changes/NNN-slug/plan.md`: everything the spec deliberately excluded.
 This is where technology lives, and **every choice names its alternative and its
 reason**.
+
+
+## Model
+
+Top of the ladder: this skill runs on Fable (`model: fable` above). First
+thing, before any question: `./scripts/phase.sh show`. If it prints nothing,
+run `./scripts/phase.sh enter sdd-plan`; if it names a phase, leave it alone
+(you were called from inside that phase). While the marker is set, every
+turn starts with the `sdd-continue` skill, which keeps the interview on Fable
+while the session default stays cheap. Writes to the artefacts this skill
+owns are refused on any other model (`scripts/hooks/guard-paths.sh`); if a
+write is refused, invoke `sdd-continue` and retry. If Fable is not available
+to this account, stop and tell the user; do not carry on in a weaker model.
 
 ## Before writing
 
@@ -150,6 +164,8 @@ On approval:
 - `./scripts/approve.sh changes/NNN-slug/plan.md approved`
 - set the change's `docs/roadmap.md` status to `planned`
 - `./scripts/index.sh`
-- commit `docs(plan): NNN-slug`, then hand to `sdd-tasks`.
+- commit `docs(plan): NNN-slug`
+- `./scripts/phase.sh leave` — everything below the plan runs on the
+  session default; then hand to `sdd-tasks`.
 
 **Do not write implementation code in this turn.**

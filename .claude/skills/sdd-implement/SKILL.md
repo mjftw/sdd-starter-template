@@ -16,6 +16,12 @@ coordination: build the brief, dispatch, verify, review, loop, commit, record.
 You read the task's **Status** lines and the Coverage table; the subagents
 read the rest.
 
+## Model
+
+Below the top of the ladder: this runs on the session default (Sonnet). First
+thing: `./scripts/phase.sh leave` (a no-op if no phase is open), so later turns
+are not moved up to Fable for nothing.
+
 ## Before starting
 
 1. Confirm `proposal.md`, `plan.md`, `tasks.md` all have

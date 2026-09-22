@@ -2,6 +2,7 @@
 type: Skill
 name: sdd-init
 description: Onboard a fresh repository created from the starter — brainstorm what the product is, then product brief, domain map of bounded contexts, constitution, roadmap of changes, glossary — before any change is specified. Use on a new project, when docs/product.md is missing or still a template, or when the user says "init", "set up the project", "new project", "let's start", or describes an app they want to build and no specs exist yet.
+model: fable
 ---
 
 # Init — the opening interviews
@@ -10,11 +11,21 @@ Runs once, on a new repository. It captures what the project *is* before any
 change is specified. Everything written here is what every later phase reads
 first, so these are the highest-leverage questions in the whole workflow.
 
-**Run this on the strongest model available.** If you have reason to think you
-are not it, say so once before starting.
-
 You are mining the user. They hold the picture; you hold the questions. Every
 answer is recorded in their words. Nothing is inferred. Article I.
+
+
+## Model
+
+Top of the ladder: this skill runs on Fable (`model: fable` above). First
+thing, before any question: `./scripts/phase.sh show`. If it prints nothing,
+run `./scripts/phase.sh enter sdd-init`; if it names a phase, leave it alone
+(you were called from inside that phase). While the marker is set, every
+turn starts with the `sdd-continue` skill, which keeps the interview on Fable
+while the session default stays cheap. Writes to the artefacts this skill
+owns are refused on any other model (`scripts/hooks/guard-paths.sh`); if a
+write is refused, invoke `sdd-continue` and retry. If Fable is not available
+to this account, stop and tell the user; do not carry on in a weaker model.
 
 ## The one rule about order
 
@@ -157,6 +168,8 @@ Write the file. **Gate**: *Approve* / *Revise*, then
 ## Step 8 — Hand off
 
 Commit: `docs(init): intent, product brief, design principles, domain, roadmap, glossary`.
+Then `./scripts/phase.sh leave`: init is over, and the next phase opens its
+own when the user starts it.
 
 Summarise in five lines: the product in one sentence; N contexts; N changes and
 which is first; the riskiest assumption; the open questions. Then offer to

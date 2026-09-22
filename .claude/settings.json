@@ -1,5 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "sonnet",
+  "env": {
+    "SDD_STRONG_MODELS": "claude-fable-*",
+    "SDD_PHASE_TTL_HOURS": "12"
+  },
   "permissions": {
     "allow": [
       "Write(specs/**)",
@@ -44,7 +49,10 @@
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
-          { "type": "command", "command": "./scripts/hooks/guard-paths.sh" }
+          {
+            "type": "command",
+            "command": "./scripts/hooks/guard-paths.sh"
+          }
         ]
       }
     ],
@@ -52,7 +60,20 @@
       {
         "matcher": "Edit|Write|MultiEdit",
         "hooks": [
-          { "type": "command", "command": "./scripts/hooks/post-edit.sh" }
+          {
+            "type": "command",
+            "command": "./scripts/hooks/post-edit.sh"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/hooks/phase-model.sh"
+          }
         ]
       }
     ]

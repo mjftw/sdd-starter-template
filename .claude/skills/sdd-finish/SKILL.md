@@ -9,6 +9,12 @@ description: Close out a converged change — merge its deltas into the living s
 Runs only after `sdd-converge` has reported **Converged** for the change. If it
 has not, stop and say so.
 
+## Model
+
+Below the top of the ladder: this runs on the session default (Sonnet). First
+thing: `./scripts/phase.sh leave` (a no-op if no phase is open), so later turns
+are not moved up to Fable for nothing.
+
 ## 1. Confirm the state
 
 - `git status` clean; every task `**Status:** done`; `tasks.md`
@@ -40,6 +46,11 @@ when they approved the proposal; you are executing it.
    missed is now in the truth. Report it before going on.
 
 ## 3. Apply the Affects
+
+The documents named here are top-of-ladder artefacts, and the guard refuses
+edits to them from the session default. So: `./scripts/phase.sh enter
+sdd-finish`, invoke `sdd-continue`, do this step, then `./scripts/phase.sh
+leave`. Skip all of that when every row says "none".
 
 For each row in `proposal.md › Affects` that is not "none": propose the exact
 edit to `docs/domain.md` / `docs/glossary.md` / `docs/product.md`, show the

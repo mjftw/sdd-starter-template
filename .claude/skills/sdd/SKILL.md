@@ -103,21 +103,40 @@ Each gate is its own approval.
 ## Model ladder
 
 Judgement lives at the top of the workflow; execution at the bottom. Model
-power follows.
+power follows, and it is enforced, not requested.
 
-| Phase | Runs as | Model |
-|---|---|---|
-| `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan`, `sdd-design` | main session | strongest available |
-| `sdd-tasks` | main session | strongest or mid |
-| `sdd-implement` (controller) | main session | mid or strongest |
-| `implementer` (per task) | subagent | mid (sonnet); `Trivial` → small |
-| `task-reviewer` (per task) | subagent | mid (sonnet) |
-| `sdd-converge` → `reviewer` | subagent | strongest — verification is never weaker than what it verifies |
-| `sdd-finish` | main session | any |
+| Phase | Runs as | Model | How it is held there |
+|---|---|---|---|
+| `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan`, `sdd-design` | main session | Fable | `model: fable` in the skill; `.sdd/phase` + `sdd-continue` every turn; the write guard |
+| `sdd-tasks`, `sdd-implement` (controller), `sdd-finish` | main session | Sonnet | project default (`.claude/settings.json › model`) |
+| `implementer` (per task) | subagent | Sonnet; `Trivial` → Haiku | `model:` in `.claude/agents/implementer.md` |
+| `task-reviewer` (per task) | subagent | Sonnet | agent frontmatter |
+| `sdd-converge` → `reviewer` | subagent | Opus — verification is never weaker than what it verifies | agent frontmatter |
 
-If you are about to run a top-of-ladder phase and have reason to think you are
-a mid or small model, say so once and suggest `/model` before continuing. Do
-not refuse; the user decides.
+Three mechanisms, each covering the others' gaps:
+
+1. **Default down.** The project's session default is Sonnet. Nothing runs
+   on Fable unless a phase asks for it.
+2. **Phase up.** A top skill's `model: fable` lasts only for the turn it is
+   invoked in, and an interview is many turns. So each top skill opens the
+   phase (`./scripts/phase.sh enter <skill>`), the `UserPromptSubmit` hook
+   `scripts/hooks/phase-model.sh` sees the marker at the start of every turn
+   and tells you to invoke `sdd-continue` (also `model: fable`) before
+   replying, and the phase closes (`./scripts/phase.sh leave`) at the gate
+   that hands to a lower phase. Do as the hook says, first, every turn.
+3. **Guard.** `scripts/hooks/guard-paths.sh` reads from the transcript which
+   model issued each write, and refuses writes to intent, proposal, delta,
+   plan, design, and the product, domain, roadmap, glossary, engineering and
+   constitution documents from any model not in `SDD_STRONG_MODELS`
+   (`.claude/settings.json › env`, default `claude-fable-*`). If you are
+   refused: invoke `sdd-continue`, retry. If the model does not change, Fable
+   is unavailable to this account: stop and tell the user. Only the user may
+   consent to writing on another model, by creating `.sdd/unlock-model`.
+   Never create it yourself.
+
+To change the strong model when a better one ships, edit `SDD_STRONG_MODELS`
+and the `model:` line in the eight skills that carry it (the seven above
+and `sdd-continue`).
 
 ## Never
 
@@ -132,6 +151,8 @@ not refuse; the user decides.
 - Edit `memory/constitution.md`, `docs/engineering.md` or `REVIEW.md` outside
   their skills. Propose instead.
 - Hand-edit frontmatter, `index.md` or `log.md`.
+- Create `.sdd/unlock-model`, or carry on a top-of-ladder phase on a model the
+  guard refuses. Tell the user instead.
 - Edit anything under `specs/`. It is the current truth and changes only by
   `merge_delta.py` at `sdd-finish`. Write a delta.
 
