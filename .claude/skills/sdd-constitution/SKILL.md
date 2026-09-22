@@ -25,6 +25,17 @@ owns are refused on any other model (`scripts/hooks/guard-paths.sh`); if a
 write is refused, invoke `sdd-continue` and retry. If Fable is not available
 to this account, stop and tell the user; do not carry on in a weaker model.
 
+## The interview record
+
+Every question this skill asks is written to `docs/interviews/constitution.md`
+(from `templates/interview-template.md`; create it on the first question,
+`sdd_phase: open`) as it is asked and answered: the question, the
+recommendation you offered, the user's answer in their words, and where in
+the artefact it landed. Questions you decided not to ask go under `## Not
+asked` with the reason. When the gate passes, set `sdd_phase: closed` and
+commit the record with the artefact. The artefact is the summary; the
+record is why it says what it says.
+
 ## If establishing it for the first time
 
 1. Read the current `memory/constitution.md`.

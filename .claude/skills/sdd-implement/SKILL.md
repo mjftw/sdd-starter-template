@@ -75,8 +75,13 @@ are not moved up to Fable for nothing.
    - Minor findings → record in `notes.md`; do not loop.
    - `UNVERIFIED` items → resolve each yourself with cross-task context. If
      one is a real gap, it goes back to the implementer as a spec failure.
-9. **Record.** Set the task's `**Status:** done`. Copy CONCERNS and minor
-   findings into `notes.md` as one-liners. If the task is the last in a phase,
+9. **Record.** `./scripts/record.sh changes/<change> task T0NN` — copies the
+   implementer's report and the reviewer's review into
+   `changes/<change>/record/tasks/`, numbered per attempt; run it after
+   *every* review, including the ones that failed, so the fix loop is on the
+   record. Then set the task's `**Status:** done`. Copy CONCERNS and minor
+   findings into `notes.md` as one-liners. Commit the record with the task
+   (`git add changes/<change>/record`). If the task is the last in a phase,
    say so in one line.
 10. **Commit** if the implementer did not. Message:
     `<type>(<scope>): <outcome> (<REQ-ids>)`.

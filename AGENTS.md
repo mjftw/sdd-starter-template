@@ -43,9 +43,16 @@ If 4 conflicts with 1–3, stop and say so. Do not pick silently.
   spec per capability. Read it before touching that capability. Never edit it;
   it is merged from deltas at `sdd-finish`.
 - `changes/NNN-slug/` — a change in flight: `intent.md`, `proposal.md`,
-  `delta/`, `design/` (wireframes or imported references, `rounds.md`, and
-  at the loop's exit `reference/`), `plan.md`, `tasks.md`, `notes.md`.
-  `changes/archive/` — shipped.
+  `delta/`, `design/` (wireframes or imported references, `rounds.md`, the
+  screenshots of every round under `rounds/`, and at the loop's exit
+  `reference/`), `plan.md`, `tasks.md`, `notes.md`, and `record/` — the
+  implementer report and review for every task attempt and every
+  convergence report, copied from `.sdd/` by `scripts/record.sh`.
+  `changes/archive/` — shipped, record included.
+- `docs/interviews/<phase>.md` — every question the init, constitution,
+  engineering and design interviews asked, the recommendation, and the
+  user's answer. Read before re-asking anything; a `grill` intent carries
+  its own record.
 - `REVIEW.md` — the review policy. `docs/adr/` — decision records.
 - `index.md` in any directory — read it first; it lists what is there by type
   and phase. `log.md` — what was approved when.
@@ -106,6 +113,10 @@ Run `check` before calling any task done, and paste the output.
   `REVIEW.md` outside their skills; propose instead.
 - Hand-edit YAML frontmatter, `index.md` or `log.md`. Use `scripts/fm.py`,
   `scripts/approve.sh`, `scripts/index.sh`.
+- Delete or rewrite anything under a change's `record/`, `design/rounds/` or
+  `docs/interviews/`. They are append-only; `record.sh` numbers attempts.
+- Show an artefact at a gate without `scripts/draft.sh` having committed
+  that version first.
 - Import another context's internals; only its `published/` interface or its
   events. `scripts/check-contexts.sh` fails otherwise.
 - Write a test that reaches inside the context. Tests go through the published
