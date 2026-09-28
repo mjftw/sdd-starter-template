@@ -40,6 +40,17 @@ If the user volunteers a technology ("it'll be in Rust"), record it under
 `## Constraints` in the intent as *stated by the user*, and move on. Do not
 follow it up here.
 
+## The interview record
+
+Every question this skill asks is written to `docs/interviews/init.md`
+(from `templates/interview-template.md`; create it on the first question,
+`sdd_phase: open`) as it is asked and answered: the question, the
+recommendation you offered, the user's answer in their words, and where in
+the artefact it landed. Questions you decided not to ask go under `## Not
+asked` with the reason. When the gate passes, set `sdd_phase: closed` and
+commit the record with the artefact. The artefact is the summary; the
+record is why it says what it says.
+
 ## Step 1 — Mechanical setup
 
 If `README.md` is still the template's own (its first line is
@@ -85,7 +96,8 @@ Fill `title` and `description` in the frontmatter, set `generated.by` to
 `claude-code/<your model id, or unknown>` and `generated.at` to now
 (`./scripts/fm.py set`), and add `/docs/intent-product.md` to `sources`.
 
-**Gate**: show it in full; `AskUserQuestion`: *Approve* / *Revise*. On
+**Gate**: `./scripts/draft.sh docs/product.md`, show it in full;
+`AskUserQuestion`: *Approve* / *Revise* (draft again after each revision). On
 approval `./scripts/approve.sh docs/product.md approved`, then
 `./scripts/index.sh`, and append each decision to `docs/decisions.md` as
 `<date> · init · <decision> · <why>`.
@@ -123,8 +135,9 @@ answer attached:
 Write the file. Three to seven contexts is normal; one is fine for a small
 product. Fill `title`, `description`, `generated.*` with `fm.py set`.
 
-**Gate**: show it in full; *Approve* / *Revise* / *Merge two contexts* /
-*Split one*. On approval `./scripts/approve.sh docs/domain.md approved`,
+**Gate**: `./scripts/draft.sh docs/domain.md`, show it in full; *Approve* /
+*Revise* / *Merge two contexts* / *Split one* (draft again after each
+revision). On approval `./scripts/approve.sh docs/domain.md approved`,
 `./scripts/index.sh`, append decisions.
 
 ## Step 5 — Constitution
@@ -153,8 +166,8 @@ it with the user, one question at a time:
   (`<context>.<capability>`); the first changes create capabilities, later ones
   modify them.
 
-Write the file with every change `proposed`. **Gate**: *Approve* / *Revise* /
-*Re-order*. On approval `./scripts/approve.sh docs/roadmap.md approved`, then
+Write the file with every change `proposed`. **Gate**:
+`./scripts/draft.sh docs/roadmap.md`; *Approve* / *Revise* / *Re-order*. On approval `./scripts/approve.sh docs/roadmap.md approved`, then
 `./scripts/index.sh`; append decisions.
 
 ## Step 7 — Glossary → `docs/glossary.md`
@@ -162,12 +175,15 @@ Write the file with every change `proposed`. **Gate**: *Approve* / *Revise* /
 List the nouns that appeared in Steps 2–6. For each, ask which context it
 belongs to and for the definition the *user* uses in that context, and what it
 must not be confused with. Specs and code will use these terms exactly.
-Write the file. **Gate**: *Approve* / *Revise*, then
-`./scripts/approve.sh docs/glossary.md approved` and `./scripts/index.sh`.
+Write the file. **Gate**: `./scripts/draft.sh docs/glossary.md`; *Approve* /
+*Revise*, then `./scripts/approve.sh docs/glossary.md approved` and
+`./scripts/index.sh`.
 
 ## Step 8 — Hand off
 
-Commit: `docs(init): intent, product brief, design principles, domain, roadmap, glossary`.
+`./scripts/fm.py set docs/interviews/init.md sdd_phase closed`. Commit:
+`docs(init): intent, product brief, design principles, domain, roadmap,
+glossary, interview record`.
 Then `./scripts/phase.sh leave`: init is over, and the next phase opens its
 own when the user starts it.
 

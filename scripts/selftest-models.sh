@@ -52,6 +52,7 @@ expect "a wireframe on Sonnet is refused"                  2 "$(guard changes/00
 expect "tasks.md on Sonnet is allowed (not top)"           0 "$(guard changes/001-x/tasks.md "$T/sonnet" tB)"
 expect "source code on Haiku is allowed"                   0 "$(guard src/a/b.py "$T/haiku" tC)"
 expect "docs/product.md on Sonnet is refused"              2 "$(guard docs/product.md "$T/sonnet" tB)"
+expect "an interview record on Sonnet is refused"          2 "$(guard docs/interviews/init.md "$T/sonnet" tB)"
 expect "docs/product.md on Opus is refused (Fable only)"   2 "$(guard docs/product.md "$T/opus" tO)"
 expect "a <synthetic> entry is skipped"                    0 "$(guard docs/domain.md "$T/synth" tD)"
 expect "the calling message wins over a later one"         2 "$(guard docs/roadmap.md "$T/later" tE)"
@@ -72,6 +73,7 @@ expect "model globs are not file globs (Fable still allowed)" 0 "$(guard changes
 rm -f "$TRAP"
 expect "a widened allowlist admits Opus"                   0 "$(SDD_STRONG_MODELS='claude-fable-* claude-opus-*' guard docs/product.md "$T/opus" tO)"
 expect "secrets stay blocked on any model"                 2 "$(guard .env "$T/fable" tA)"
+expect "AUTONOMY.md is the user's, blocked on any model"   2 "$(guard AUTONOMY.md "$T/fable" tA)"
 
 echo "Phase marker"
 ./scripts/phase.sh leave >/dev/null
@@ -90,6 +92,7 @@ for s in sdd-init grill sdd-specify sdd-plan sdd-design sdd-constitution sdd-eng
   expect "$s carries model: fable"                         fable "$(./scripts/fm.py get .claude/skills/$s/SKILL.md model 2>/dev/null)"
 done
 expect "reviewer is pinned to Opus"                        opus "$(./scripts/fm.py get .claude/agents/reviewer.md model 2>/dev/null)"
+expect "decider is pinned to Fable"                       fable "$(./scripts/fm.py get .claude/agents/decider.md model 2>/dev/null)"
 
 echo
 [[ $FAIL -eq 0 ]] && echo "✅ $N checks passed" || echo "❌ model ladder self-test failed"

@@ -134,7 +134,9 @@ cannot be turned off, that is itself the top risk.
 
 ## Gate
 
-Write the file, then report in at most five lines:
+Write the file, `./scripts/draft.sh changes/NNN-slug/plan.md` (a numbered
+draft commit; again after every revision), then report in at most five
+lines:
 
 - The approach in one sentence
 - The choices most likely to be wrong, and the alternative for each
@@ -142,6 +144,13 @@ Write the file, then report in at most five lines:
 - Any departure from `docs/engineering.md`, by section
 - Open questions, numbered
 - Anything in the spec this plan cannot satisfy
+
+This is the **last gate**. After it the run is unattended (`AUTONOMY.md`):
+tasks, implementation, fixes, amendments, converge and finish happen without
+the user. So before asking, look for anything in the plan that could become
+a one-way door mid-build (a published schema, a storage shape, a dependency,
+a data-handling rule) and settle it here, with the user, as an open question.
+Say in one line that approving the plan starts the unattended run.
 
 Then `AskUserQuestion`: *Approve*, *Revise*, *Change a specific choice*,
 *Answer open questions first*.
