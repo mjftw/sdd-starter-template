@@ -118,7 +118,7 @@ you have them, and makes the first commit.
                     │  sdd-tasks      → tasks.md      [GATE]       │
                     │  sdd-implement  → code, one task at a time   │
                     │       ├ brief   → implementer (cheap model)  │
-                    │       ├ verify  → controller re-runs tests   │
+                    │       ├ package → re-runs tests, records it  │
                     │       └ review  → task-reviewer, fix loop    │
                     │  sdd-converge   → reviewer audits the change │
                     │       └ gaps    → back to implement          │
@@ -194,7 +194,8 @@ proves. Gate.
 `scripts/task-brief.sh` extracts the task, its requirements, the relevant plan
 sections, your preferences, the commands and the constitution into one file. It
 dispatches an `implementer` subagent that reads only that brief and works TDD.
-It re-runs the verification itself. It packages the diff, dispatches a
+It packages the diff with `scripts/review-package.sh`, which re-runs the
+verification itself and records the output and exit status. It dispatches a
 `task-reviewer` for two verdicts on spec compliance and then quality, and loops
 a fixer on failures; after three rounds the decider rules on it. Then it
 marks the task done and commits. An implementer that hits a question about
@@ -294,7 +295,7 @@ Judgement at the top, hands at the bottom, model power following:
 |---|---|---|
 | `sdd-init`, `sdd-constitution`, `sdd-engineering`, `grill`, `sdd-specify`, `sdd-plan`, `sdd-design` | main session | Fable |
 | `sdd-tasks`, `sdd-implement` (controller), `sdd-finish` | main session | Sonnet, the project default |
-| `implementer`, `task-reviewer` (per task) | subagents | Sonnet (Haiku for a trivial task) |
+| `implementer`, `task-reviewer` (per task) | subagents | Sonnet (Haiku for a task marked `Class: trivial`) |
 | `sdd-converge` → `reviewer` | subagent | Opus |
 
 The ladder is enforced, not requested. The session starts on Sonnet
@@ -481,8 +482,9 @@ It cannot write a test that reaches inside the context. `task-reviewer` marks
 that as an important finding, and the `bdd` skill's litmus is whether the
 implementation could be rewritten with this test still passing unedited.
 
-It cannot mark a task done on the implementer's word. The controller re-runs
-the verification itself, and then a separate reviewer checks the diff.
+It cannot mark a task done on the implementer's word. The review package
+re-runs the verification and records the result, and then a separate reviewer
+checks the diff.
 
 It cannot re-ask a recorded decision, or answer an open question on your
 behalf.
@@ -530,7 +532,7 @@ All stdlib bash and Python 3, no dependencies.
 | `selftest-models.sh` | checks the model ladder's enforcement on this install: the write guard, the phase marker, the skill and agent model lines |
 | `design_snapshot.py <change> wireframes\|live\|reference` | screenshots every screen and state in the Interface table: the wireframes, the running app (with `--variants a,b,c` for a round of the loop), or the references at its exit |
 | `task-brief.sh <change> <TID>` | extracts one task into a self-contained brief for the implementer |
-| `review-package.sh <change> <TID> <base>` | packages a task's diff for the reviewer |
+| `review-package.sh <change> <TID> <base> [--incremental] [--check CMD]` | packages a task's diff for the reviewer, running the task's Verify line and the check command and recording their output; `--incremental` packages a fix loop as the previous verdict plus the diff since it |
 | `hooks/guard-paths.sh` | `PreToolUse`: protected paths |
 | `hooks/post-edit.sh` | `PostToolUse`: runs your formatter, filled in by the first plan |
 
