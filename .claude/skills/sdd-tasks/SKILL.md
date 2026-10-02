@@ -45,6 +45,11 @@ constitution). It cannot read the rest of `tasks.md`, the spec, or the plan.
 So each task carries everything it needs:
 
 - **Status** line — `todo` initially.
+- **Class** line — `standard`, or `trivial` for purely mechanical work with
+  no judgement in it: a rename, deleting a REMOVED requirement's tests and
+  the code only it used, a format or lint chore, filling a documented
+  value in. The controller runs a trivial task on the small model and
+  skips the quality stage of its review. When in doubt, `standard`.
 - **Files** — exact paths. `Create:` / `Modify: path:lines` / `Test:`.
 - **Interfaces** — `Consumes:` exact signatures from earlier tasks;
   `Produces:` exact signatures this task exposes. Character-for-character.
@@ -87,6 +92,8 @@ Run these over the whole file and fix what fails before presenting:
 - **Spec coverage** — every `REQ-` appears in the Coverage table with a task.
 - **Interface consistency** — every `Consumes:` matches a `Produces:` above
   it exactly. Fill the Interface consistency table.
+- **Class honesty** — every `trivial` task has no RED step that proves a
+  scenario; anything with a scenario is `standard`.
 - **Placeholder scan** —
   `grep -nE 'TBD|TODO|<[a-z ]+>|handle .* cases|error handling|similar to|like T[0-9]+' changes/NNN-slug/tasks.md`
   returns nothing outside the template's own guidance block.
