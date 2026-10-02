@@ -160,7 +160,7 @@ for d in changes/[0-9][0-9][0-9]-*/; do
     done
     # does it merge cleanly?
     if [[ "$status" != "draft" ]]; then
-      ./scripts/merge_delta.py preview "$d" >/dev/null 2>/tmp/md.err || bad "delta does not merge: $(tail -1 /tmp/md.err)"
+      MDERR=$(mktemp); ./scripts/merge_delta.py preview "$d" >/dev/null 2>"$MDERR" || bad "delta does not merge: $(tail -1 "$MDERR")"; rm -f "$MDERR"
     fi
   fi
 
@@ -170,34 +170,31 @@ for d in changes/[0-9][0-9][0-9]-*/; do
   fi
 
   UNTOUCHED=false
-  grep -qE '<[A-Za-z][^>]*>' "$d/proposal.md" && { warn "proposal.md still contains template placeholders"; UNTOUCHED=true; }
+  # a placeholder is one of the template's own <tokens>, outside the template's guidance quotes — not any <word> in the user's copy
+  PH=$(grep -vE '^\s*>' templates/proposal-template.md | grep -oE '<[A-Za-z][^>]*>' | sort -u)
+  if [[ -n "$PH" ]] && grep -vE '^\s*>' "$d/proposal.md" | grep -qF -f <(printf '%s\n' "$PH"); then warn "proposal.md still contains template placeholders"; UNTOUCHED=true; fi
   if $UNTOUCHED; then echo; continue; fi
 
   if [[ "$status" == "approved" ]] && awk '/^## Open questions/,/^## /' "$d/proposal.md" | grep -qE '^\| [0-9]+ \|[^|]*[A-Za-z]'; then
     warn "approved proposal still lists open questions"
   fi
 
-  if [[ -f "$d/tasks.md" ]]; then
-    for t in $(awk '/^### T[0-9]+/{t=$2} /\*\*Status:\*\* *done/{if(t)print t; t=""}' "$d/tasks.md" | sort -u); do
-      compgen -G "$d/record/tasks/$t-review-*.md" >/dev/null || warn "$t is done but has no review in $d/record/tasks/ — run ./scripts/record.sh $d task $t"
+  if [[ -d "$d/tasks" ]]; then
+    ./scripts/task.py "$d" check | sed 's/^/  /' | grep -v '^    ✅' || true
+    ./scripts/task.py "$d" check >/dev/null 2>&1 || FAIL=1
+    for tf in "$d"/tasks/C*_T*.md; do
+      t=$(basename "$tf" .md)
+      [[ "$(./scripts/fm.py get "$tf" sdd_phase)" == done ]] && { compgen -G "$d/record/tasks/$t-review-*.md" >/dev/null || warn "$t is done but has no review in $d/record/tasks/ — run ./scripts/record.sh $d task $t"; }
     done
-    parked=$(grep -cE '\*\*Status:\*\* *parked' "$d/tasks.md" || true)
-    esc=$(grep -l '^sdd_verdict: escalated' "$d"/record/decisions/D*.md 2>/dev/null | wc -l)
-    ndec=$(ls "$d"/record/decisions/D*.md 2>/dev/null | wc -l)
-    [[ $ndec -gt 0 ]] && echo "  · $ndec decision(s) recorded, $esc escalated"
+    parked=$(grep -l '^sdd_phase: parked' "$d"/tasks/C*_T*.md 2>/dev/null | wc -l)
+    nxt=$(./scripts/task.py "$d" next); echo "  · tasks: $(ls "$d"/tasks/C*_T*.md | wc -l), next: $nxt"
     [[ $parked -gt 0 ]] && warn "$parked task(s) parked on an escalation — see ./scripts/report.sh $d"
-    pend=$(./scripts/record.sh "$d" amendments 2>/dev/null | grep -c '→' || true)
-    [[ $pend -gt 0 && "$(./scripts/fm.py get "$d/tasks.md" sdd_phase 2>/dev/null)" == complete ]] && bad "$pend decided amendment(s) not applied to the delta"
-    dupes=$(grep -oE '^### T[0-9]+' "$d/tasks.md" | sed 's/### //' | sort | uniq -d)
-    [[ -n "$dupes" ]] && bad "tasks.md has duplicate task IDs: $(echo $dupes | tr '\n' ' ') — the brief would pick the first"
-    for t in $(grep -oE '^### T[0-9]+' "$d/tasks.md" | sed 's/### //' | sort -u); do
-      blk=$(awk -v t="### $t " 'index($0,t)==1{p=1;print;next} p&&(/^### /||/^## /){exit} p{print}' "$d/tasks.md")
-      for need in '\*\*Status:\*\*' '\*\*Files\*\*' '\*\*Steps\*\*' '\*\*Verify\*\*'; do
-        printf '%s' "$blk" | grep -qE "$need" || warn "$t is missing $need"
-      done
-      printf '%s' "$blk" | grep -qE 'TBD|TODO|handle (edge|error) |error handling|similar to T|like T[0-9]' && warn "$t contains a placeholder phrase"
-    done
   fi
+  esc=$(grep -l '^sdd_verdict: escalated' "$d"/record/decisions/D*.md 2>/dev/null | wc -l)
+  ndec=$(ls "$d"/record/decisions/D*.md 2>/dev/null | wc -l)
+  [[ $ndec -gt 0 ]] && echo "  · $ndec decision(s) recorded, $esc escalated"
+  pend=$(./scripts/record.sh "$d" amendments 2>/dev/null | grep -c '→' || true)
+  [[ $pend -gt 0 && "$(./scripts/fm.py get "$d/tasks.md" sdd_phase 2>/dev/null)" == complete ]] && bad "$pend decided amendment(s) not applied to the delta"
   echo
 done
 

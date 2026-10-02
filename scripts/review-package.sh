@@ -36,21 +36,16 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 NAME=$(basename "$SLICE")
+CNUM="C${NAME%%-*}"; case "$TID" in T[0-9]*) TID="${CNUM}_$TID" ;; esac   # T011 → C008_T011, as record.sh expects
 OUT=".sdd/reviews/${NAME}/${TID}.md"
 mkdir -p "$(dirname "$OUT")"
 NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 HEAD_SHA=$(git rev-parse HEAD)
 
-section() { # file prefix — from a "### <prefix>" heading to the next "### " or "## "
-  awk -v t="$2" '
-    index($0, t) == 1 { p = 1; print; next }
-    p && (/^### / || /^## /) { exit }
-    p { print }' "$1"
-}
-
-# The Verify line: the first backticked command on the task's **Verify** line.
-TASK=$(section "$SLICE/tasks.md" "### $TID ")
-VERIFY_CMD=$(printf '%s\n' "$TASK" | grep -m1 -E '^\*\*Verify\*\*' | grep -oE '`[^`]+`' | head -1 | tr -d '`' || true)
+# The Verify line: the first backticked command on the task file's **Verify** line.
+TASKFILE="$SLICE/tasks/$TID.md"
+[[ -f "$TASKFILE" ]] || { echo "error: no task file $TASKFILE (./scripts/task.py $SLICE list)" >&2; exit 1; }
+VERIFY_CMD=$(grep -m1 -E '^\*\*Verify\*\*' "$TASKFILE" | grep -oE '`[^`]+`' | head -1 | tr -d '`' || true)
 
 # The check command: AGENTS.md › Commands, a `# check…: <cmd>` line or the
 # first non-comment line after `# check…`.
@@ -100,6 +95,7 @@ fi
   echo "status: draft"
   echo "tags: [sdd, review, \"change:$NAME\"]"
   echo "sources:"
+  echo "  - resource: /$TASKFILE"
   echo "  - resource: /.sdd/briefs/$NAME/$TID.md"
   echo "  - resource: git:${BASE}..${HEAD_SHA}"
   [[ -n "$PREV" ]] && echo "  - resource: /$PREV"

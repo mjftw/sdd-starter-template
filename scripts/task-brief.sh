@@ -21,6 +21,7 @@ SLICE="${1:?usage: task-brief.sh changes/NNN-slug T0NN}"
 SLICE="${SLICE%/}"
 TID="${2:?usage: task-brief.sh changes/NNN-slug T0NN}"
 NAME=$(basename "$SLICE")
+CNUM="C${NAME%%-*}"; case "$TID" in T[0-9]*) TID="${CNUM}_$TID" ;; esac   # T011 → C008_T011, as record.sh expects
 OUT=".sdd/briefs/${NAME}/${TID}.md"
 mkdir -p "$(dirname "$OUT")"
 
@@ -41,14 +42,14 @@ h2() { # file "## Heading"
 TARGET=".sdd/target/$NAME"
 ./scripts/merge_delta.py preview "$SLICE" >/dev/null || { echo "error: could not build target state for $SLICE" >&2; exit 1; }
 
-N=$(grep -cE "^### $TID " "$SLICE/tasks.md" || true)
-if [[ "$N" -gt 1 ]]; then
-  echo "error: $TID appears $N times in $SLICE/tasks.md; fix the duplicate before briefing" >&2; exit 1
-fi
-TASK=$(section "$SLICE/tasks.md" "### $TID ")
-if [[ -z "$TASK" ]]; then
-  echo "error: no task '$TID' in $SLICE/tasks.md" >&2; exit 1
-fi
+TASKFILE="$SLICE/tasks/$TID.md"
+[[ -f "$TASKFILE" ]] || { echo "error: no task file $TASKFILE (./scripts/task.py $SLICE list)" >&2; exit 1; }
+TASK=$(sed '1,/^---$/{/^---$/!d}' "$TASKFILE" | sed '1,/^---$/d')   # body only: the anatomy, no frontmatter
+
+# The requirements this task cites, from the task file's frontmatter.
+QRS=$(./scripts/fm.py get "$TASKFILE" sdd_requirements | tr -d '[],' || true)
+QRS=$(printf '%s\n' $QRS | sort -u)
+CAPS=$(printf '%s\n' $QRS | cut -d/ -f1 | sort -u)
 
 NOW=$(date -u +%Y-%m-%dT%H:%M:%SZ)
 STALE=$(date -u -d '+7 days' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+7d +%Y-%m-%dT%H:%M:%SZ)
@@ -62,7 +63,7 @@ STALE=$(date -u -d '+7 days' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+7d +%
   echo "status: draft"
   echo "tags: [sdd, brief, \"change:$NAME\"]"
   echo "sources:"
-  echo "  - resource: /$SLICE/tasks.md"
+  echo "  - resource: /${TASKFILE#./}"
   echo "  - resource: /$SLICE/proposal.md"
   echo "  - resource: /$SLICE/plan.md"
   echo "  - resource: /docs/engineering.md"
@@ -79,12 +80,11 @@ STALE=$(date -u -d '+7 days' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+7d +%
   echo "requirements; use them verbatim. If something you need is missing,"
   echo "report DECISION_NEEDED with the exact question. Do not guess."
   echo
-  echo "## Task (verbatim from tasks.md)"; echo
+  echo "## Task (verbatim from the task file)"; echo
   printf '%s\n' "$TASK"
   echo
   echo "## Requirements cited (verbatim from the target state of the capability)"
-  # task heading cites qualified ids: <context>.<capability>/REQ-NNN
-  for qr in $(printf '%s\n' "$TASK" | head -1 | grep -oE '[a-z0-9-]+\.[a-z0-9-]+/REQ-[0-9]+' | sort -u); do
+  for qr in $QRS; do
     cc="${qr%%/*}"; r="${qr##*/}"; ctx="${cc%%.*}"; cap="${cc##*.}"
     tf="$TARGET/$ctx/$cap.md"
     echo; echo "**$qr** (from \`specs/$ctx/$cap.md\` after this change):"; echo
@@ -94,7 +94,6 @@ STALE=$(date -u -d '+7 days' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+7d +%
   echo "## The delta this change makes (what is new or different)"
   # Only the capabilities this task cites. A task that cites none (Foundations,
   # Hardening) gets every delta, since it serves all of them.
-  CAPS=$(printf '%s\n' "$TASK" | head -1 | grep -oE '[a-z0-9-]+\.[a-z0-9-]+/REQ-[0-9]+' | cut -d/ -f1 | sort -u) || true
   for d in "$SLICE"/delta/*/*.md; do
     [[ -f "$d" ]] || continue
     cc="$(basename "$(dirname "$d")").$(basename "$d" .md)"
@@ -106,7 +105,7 @@ STALE=$(date -u -d '+7 days' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+7d +%
   echo
   echo "### Requirement → design mapping (rows for the cited requirements)"; echo
   h2 "$SLICE/plan.md" "## Requirement → design mapping" | grep -E '^\|' | head -2
-  for qr in $(printf '%s\n' "$TASK" | head -1 | grep -oE '[a-z0-9-]+\.[a-z0-9-]+/REQ-[0-9]+' | sort -u); do
+  for qr in $QRS; do
     h2 "$SLICE/plan.md" "## Requirement → design mapping" | grep -F "$qr" || true
   done
   for h in "## Interfaces" "## Data model" "## Structure" "## Test strategy"; do
