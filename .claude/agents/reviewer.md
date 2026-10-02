@@ -19,12 +19,14 @@ command you are about to run would write to the tree, do not run it.
    exclusions. Apply it exactly; do not add passes it does not list or soften
    ones it does.
 2. Read `changes/<change>/proposal.md`, every file under `delta/`, the target
-   state under `.sdd/target/<change>/`, `plan.md`, `tasks.md`, `notes.md`,
+   state under `.sdd/target/<change>/`, `plan.md`, `tasks.md` and
+   `tasks/index.md` (open an individual `tasks/CNNN_TNNN.md` only when a finding
+   needs it), `notes.md`,
    `docs/engineering.md`, `docs/domain.md`, and `memory/constitution.md`.
 3. Run every pass in `REVIEW.md`, in order. For pass 1, walk every ADDED and
    MODIFIED requirement in the deltas and find its implementation and its test
    in the code, and confirm every REMOVED one has no remaining test or dead
-   code — do not take `tasks.md`'s word for any of it.
+   code — do not take a task file's word for any of it.
 4. Run the suite, lint, and typecheck commands from `AGENTS.md`. Paste output.
    Also run `./scripts/check-scenarios.sh --change changes/<change>`,
    `./scripts/check-contexts.sh` and `./scripts/check-design.sh --change
@@ -81,4 +83,4 @@ artefact requires, and what the code does.
 
 Return only the report's `### Critical`, `### Warning` and `### Verdict`
 sections as your output; the controller reads the file for the rest. Do not
-append to `tasks.md`; the controller does that.
+add tasks; the controller does that.
