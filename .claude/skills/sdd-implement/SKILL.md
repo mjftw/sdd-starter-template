@@ -28,9 +28,13 @@ are not moved up to Fable for nothing.
    `sdd_phase: approved`.
    Then `./scripts/fm.py set changes/<change>/tasks.md sdd_phase in-progress`.
 2. Read `docs/decisions.md`. Read `docs/engineering.md` §13 for the branch and
-   commit conventions.
+   commit conventions. Note the check command from `AGENTS.md › Commands`;
+   if it is not on a `# check…` line there, pass it to `review-package.sh`
+   with `--check`.
 3. If the user wants isolation, create a worktree for the change
    (`git worktree add ../<repo>-<change> <branch>`) and work there.
+   `./scripts/fm.py get changes/<change>/plan.md sdd_parallel` says whether
+   the user authorised parallel `[P]` tasks at the plan gate (step 10).
 4. Find the first task with `**Status:** todo`. If resuming, say the last
    `done` and the next `todo` in one line.
 
@@ -48,7 +52,10 @@ are not moved up to Fable for nothing.
    with: one line of scene-setting, the brief path ("read this first — it is
    your requirements, with the exact values to use verbatim"), the additions
    from step 2, the report path.
-4. **Read the report.** Branch on STATUS. The user is not here; nothing in
+4. **Read the report.** The implementer returns only its STATUS, COMMIT,
+   CONCERNS, CHOICES MADE and any QUESTION/OPTIONS lines; the report file
+   has the rest. Read the file only when a line you need is not in what came
+   back (`grep -A` the section), never in full. Branch on STATUS. The user is not here; nothing in
    this step asks them anything (`AUTONOMY.md`).
    - `DECISION_NEEDED` → if a recorded decision already answers it
      (`docs/decisions.md`, `intent.md`, an earlier verdict in
@@ -83,27 +90,34 @@ are not moved up to Fable for nothing.
    on that task, and the decider parks it then.
    Only when every remaining task is `parked` does implementation end; the
    run still goes on to amendments, converge and finish for what was built.
-5. **Verify independently.** Run the task's Verify line and the `check`
-   command yourself. Do not accept the pasted output. Disagreement → treat as
-   a failed review with your own finding.
-6. **Package.** `./scripts/review-package.sh changes/<change> T0NN $BASE` → diff
-   path. (`$BASE` from step 2; never `HEAD~1`.)
-7. **Review.** Dispatch `task-reviewer` (Agent tool,
+5. **Package and verify.** `./scripts/review-package.sh changes/<change>
+   T0NN $BASE` → package path (`$BASE` from step 2; never `HEAD~1`). The
+   script runs the task's Verify line and the `check` command itself and
+   records their output and exit status under `## Commands`: that is the
+   independent verification, so do not run them again and do not accept the
+   implementer's paste. Read the two `exit status` lines (`grep 'exit
+   status' <package>`). A non-zero status, or a Verify or check command the
+   package could not find, is a failed review with your own finding: supply
+   the command (`--check`, or fix the task's Verify line in `tasks.md` with
+   `draft.sh`) and re-package.
+6. **Review.** Dispatch `task-reviewer` (Agent tool,
    `subagent_type: task-reviewer`) with the brief path, the report path, the
    review-package path, and — verbatim — the plan's binding constraints for
    this task if any.
-8. **Act on the verdicts.**
+7. **Act on the verdicts.**
    - `SPEC: FAIL` or `QUALITY: FAIL` with critical/important findings →
-     dispatch the implementer again as a **fixer**: same brief, the findings
+     record first (step 8, so the verdict is on the record), then dispatch
+     the implementer again as a **fixer**: same brief, the findings
      verbatim, "fix only these; re-run the covering tests; report with output".
-     Verify (step 5), re-package, re-review. Loop until both PASS. After three
+     Re-package with `--incremental` (the package then carries the previous
+     verdict and only the diff since it) and re-review. Loop until both PASS. After three
      loops, the findings go to the `decider`: it rules whether the test or the
      code is wrong, whether to accept a documented deviation, or to park. Do
      not stop the run.
    - Minor findings → record in `notes.md`; do not loop.
    - `UNVERIFIED` items → resolve each yourself with cross-task context. If
      one is a real gap, it goes back to the implementer as a spec failure.
-9. **Record.** `./scripts/record.sh changes/<change> task T0NN` — copies the
+8. **Record.** `./scripts/record.sh changes/<change> task T0NN` — copies the
    implementer's report and the reviewer's review into
    `changes/<change>/record/tasks/`, numbered per attempt; run it after
    *every* review, including the ones that failed, so the fix loop is on the
@@ -111,14 +125,23 @@ are not moved up to Fable for nothing.
    findings into `notes.md` as one-liners. Commit the record with the task
    (`git add changes/<change>/record`). If the task is the last in a phase,
    say so in one line.
-10. **Commit** if the implementer did not. Message:
+9. **Commit** if the implementer did not. Message:
     `<type>(<scope>): <outcome> (<REQ-ids>)`.
-11. Next task. `[P]` tasks may run as parallel implementers in separate
-    worktrees if the user has approved that for this change; review each
-    separately; merge in task order.
+10. Next task. When `plan.md` has `sdd_parallel: yes` (the user said so at
+    the plan gate), a run of consecutive `[P]` tasks is dispatched as
+    parallel implementers, one worktree each (`git worktree add
+    .sdd/worktrees/<change>-T0NN <branch>`), in one Agent call. Review each
+    separately, in task order, merging each task's branch into the change
+    branch before packaging the next so every review sees the code it
+    builds on. A merge conflict between two `[P]` tasks means they were not
+    independent: resolve it, note it in `notes.md`, and run the rest of
+    that run serially. Without `sdd_parallel: yes`, serial.
 
-`Trivial`-class tasks: dispatch the implementer with the model overridden to
-the small tier, and skip Stage 2 of review.
+A task whose `**Class:**` line says `trivial` (the tasks skill marks
+mechanical work: a rename, deleting a REMOVED requirement's tests, a
+lint or format chore) is dispatched with the implementer's model overridden
+to the small tier (`model: haiku` in the Agent call), and the reviewer is
+told to skip Stage 2. A task with no Class line is `standard`.
 
 ## The run does not stop
 

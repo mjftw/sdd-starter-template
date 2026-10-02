@@ -31,6 +31,8 @@ sdd_phase: draft          # draft | approved | in-progress | complete
 > `[P]` after the ID: no dependency on the neighbouring `[P]` tasks.
 >
 > Status per task: `todo` · `in-progress` · `done` · `blocked`.
+> Class per task: `standard` · `trivial` (mechanical, no scenario; runs on
+> the small model, quality review skipped).
 >
 > Every RED step names the scenario ID it proves. A task with no scenario is
 > Foundations or Hardening.
@@ -45,6 +47,7 @@ _Nothing user-visible. Scaffolding, types, schema, test harness._
 ### T001 · — · <one outcome>
 
 **Status:** todo
+**Class:** standard
 
 **Files**
 - Create: `path/to/new.py`
@@ -79,6 +82,7 @@ _Ends with something demonstrable against a requirement._
 ### T010 · <context>.<capability>/REQ-001 · <one outcome>
 
 **Status:** todo
+**Class:** standard
 
 **Files**
 -
@@ -96,6 +100,7 @@ _Ends with something demonstrable against a requirement._
 ### T090 · — · Every row of spec §Edge cases has a test
 
 **Status:** todo
+**Class:** standard
 
 **Files**
 - Test: `<paths>`
